@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
@@ -21,11 +22,12 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
     loadImages();
   }, []);
 
+  // Fix: Explicitly cast 'ease' to 'as const' to ensure it is treated as a specific Easing literal rather than a generic string
   const fadeIn = {
     initial: { opacity: 0, y: 15 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
-    transition: { duration: 0.6, ease: "easeOut" }
+    transition: { duration: 0.6, ease: "easeOut" as const }
   };
 
   const placeholder = (title: string) => `https://via.placeholder.com/800x600/F5F3FF/6C63FF?text=${encodeURIComponent(title)}`;

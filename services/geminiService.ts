@@ -1,14 +1,14 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Grade, Subject, Worksheet, Question } from "../types";
-
-// Using GEMINI_API_KEY as the environment variable for Vercel deployment
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
  * Generates brand illustrations.
  * Hyper-realistic, human-centric learning scenes.
  */
 export const generateAppImage = async (promptId: number): Promise<string> => {
+  // Fix: Obtained API key exclusively from process.env.API_KEY and used directly for initialization
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompts = [
     "Hyper-realistic 8k professional photograph of a young child with soft curly hair and a blue knit sweater, looking at a modern white tablet with an expression of pure joy and wonder. The room is filled with soft, warm afternoon sunlight. High-detail skin textures, authentic expression, cinematic depth of field, masterpiece quality.",
     "Close-up high-detail photograph of a parent's hands and a child's hands together, working on a clean, high-quality printed paper worksheet with colorful educational diagrams. Warm natural lighting, authentic textures of paper and pencil, grounded home setting, 8k resolution.",
@@ -29,6 +29,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
       }
     });
 
+    // Fix: Access parts through response.candidates[0] as per guidelines
     const parts = response.candidates?.[0]?.content?.parts;
     if (parts) {
       for (const part of parts) {
@@ -49,6 +50,8 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
  * Generates a full worksheet based on child's grade and subject.
  */
 export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject): Promise<Partial<Worksheet>> => {
+  // Fix: Obtained API key exclusively from process.env.API_KEY and used directly for initialization
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
   Focus on grade-appropriate challenges. Include 10-15 varied problems.
@@ -84,6 +87,7 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
   });
 
   try {
+    // Fix: Access the text output via the .text property (not a method) as required
     const data = JSON.parse(response.text.trim() || '{}');
     return {
       title: data.title,
@@ -105,6 +109,8 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
  * Provides pedagogical support for the student using the TutorView.
  */
 export const getTutorExplanation = async (userQuestion: string, context: string, grade: Grade): Promise<string> => {
+  // Fix: Obtained API key exclusively from process.env.API_KEY and used directly for initialization
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `You are a friendly, patient, and highly encouraging learning assistant for a child in ${grade}.
   
   CONTEXT:
@@ -126,6 +132,7 @@ export const getTutorExplanation = async (userQuestion: string, context: string,
       contents: prompt,
     });
 
+    // Fix: Access the text output via the .text property (not a method) as required
     return response.text || "I'm sorry, I'm having a little trouble thinking right now. Can you try asking that in a different way?";
   } catch (error) {
     console.error("Tutor explanation failed:", error);
