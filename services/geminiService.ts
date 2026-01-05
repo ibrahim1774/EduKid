@@ -6,8 +6,12 @@ import { Grade, Subject, Worksheet, Question } from "../types";
  * Hyper-realistic, human-centric learning scenes.
  */
 export const generateAppImage = async (promptId: number): Promise<string> => {
-  // Use process.env.API_KEY directly as required by instructions
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.warn("API_KEY not found in process.env. Images may not load.");
+  }
+  
+  const ai = new GoogleGenAI({ apiKey: apiKey || "" });
   const prompts = [
     "Hyper-realistic 8k professional photograph of a young child with soft curly hair and a blue knit sweater, looking at a modern white tablet with an expression of pure joy and wonder. The room is filled with soft, warm afternoon sunlight. High-detail skin textures, authentic expression, cinematic depth of field, masterpiece quality.",
     "Close-up high-detail photograph of a parent's hands and a child's hands together, working on a clean, high-quality printed paper worksheet with colorful educational diagrams. Warm natural lighting, authentic textures of paper and pencil, grounded home setting, 8k resolution.",
@@ -37,7 +41,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
         }
       }
     }
-    return "https://picsum.photos/seed/edukid/1200/800";
+    return `https://picsum.photos/seed/edukid${promptId}/1200/800`;
   } catch (error) {
     console.error("Image generation failed", error);
     return `https://picsum.photos/seed/edukid${promptId}/1200/800`;
@@ -48,7 +52,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
  * Generates a full worksheet based on child's grade and subject.
  */
 export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject): Promise<Partial<Worksheet>> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
   const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
   Focus on grade-appropriate challenges. Include 10-15 varied problems.
@@ -106,7 +110,7 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
  * Provides pedagogical support for the student using the TutorView.
  */
 export const getTutorExplanation = async (userQuestion: string, context: string, grade: Grade): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
   const prompt = `You are a friendly, patient, and highly encouraging learning assistant for a child in ${grade}.
   
   CONTEXT:

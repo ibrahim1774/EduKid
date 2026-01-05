@@ -9,16 +9,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-        // Critical: Polyfill process.env for browser compatibility in Vite/Vercel
-        window.process = {
-            env: {
-                API_KEY: "",
-                GEMINI_API_KEY: "" 
-            }
-        };
-        // Global error tracking for debugging deployment issues
+        // Ensure process.env exists without wiping out existing values
+        window.process = window.process || { env: {} };
+        window.process.env = window.process.env || {};
+        
+        // Bridge GEMINI_API_KEY to API_KEY if needed (matching user's Vercel config)
+        if (!window.process.env.API_KEY && window.process.env.GEMINI_API_KEY) {
+            window.process.env.API_KEY = window.process.env.GEMINI_API_KEY;
+        }
+
+        // Global error tracking for debugging
         window.onerror = function(msg, url, line, col, error) {
-            console.error("Global Error: " + msg + " at " + url + ":" + line);
+            console.error("EduKid Runtime Error: " + msg + " at " + url + ":" + line);
         };
     </script>
     <style>
