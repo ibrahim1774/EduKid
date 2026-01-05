@@ -1,21 +1,84 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
 import { generateAppImage } from '../services/geminiService';
 
+// Fast-loading, high-quality defaults for immediate first-paint
+const DEFAULT_IMAGES = [
+  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1200", // Hero
+  "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=800",  // Feature 1
+  "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",  // Feature 2
+  "https://images.unsplash.com/photo-1454165833767-027ffea9e77b?auto=format&fit=crop&q=80&w=800",  // Feature 3
+  "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=1200", // Showcase
+  "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&q=80&w=800"   // Feature 4
+];
+
+const DB_NAME = 'edukid_assets';
+const STORE_NAME = 'brand_images';
+
+// Helper for IndexedDB as localStorage is too small for images
+const getCachedImages = (): Promise<string[] | null> => {
+  return new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const getReq = store.get('brand_set');
+        getReq.onsuccess = () => resolve(getReq.result || null);
+        getReq.onerror = () => resolve(null);
+      };
+      request.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+};
+
+const cacheImages = (urls: string[]): Promise<void> => {
+  return new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put(urls, 'brand_set');
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      };
+      request.onerror = () => resolve();
+    } catch (e) {
+      resolve();
+    }
+  });
+};
+
 export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = ({ onStart, onLogin }) => {
-  const [images, setImages] = useState<string[]>([]);
-  const [loadingImages, setLoadingImages] = useState(true);
+  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
+  const [isAiGenerated, setIsAiGenerated] = useState(false);
 
   useEffect(() => {
     const loadImages = async () => {
+      // 1. Check IndexedDB for existing AI assets (No 5MB limit here)
+      const cached = await getCachedImages();
+      if (cached && Array.isArray(cached) && cached.length === 6) {
+        setImages(cached);
+        setIsAiGenerated(true);
+        return;
+      }
+
+      // 2. Background generate if not found (or if previous storage failed)
       try {
         const urls = await Promise.all([0, 1, 2, 3, 4, 5].map(id => generateAppImage(id)));
         setImages(urls);
+        setIsAiGenerated(true);
+        await cacheImages(urls); // Uses IndexedDB for much larger quota
       } catch (err) {
-        console.error("Error loading brand illustrations:", err);
-      } finally {
-        setLoadingImages(false);
+        console.error("Background AI generation failed, using high-quality defaults:", err);
       }
     };
     loadImages();
@@ -27,8 +90,6 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
     viewport: { once: true },
     transition: { duration: 0.6, ease: "easeOut" as const }
   };
-
-  const placeholder = (title: string) => `https://via.placeholder.com/800x600/F5F3FF/6C63FF?text=${encodeURIComponent(title)}`;
 
   return (
     <div className="w-full bg-[#F7F9FC]">
@@ -71,12 +132,25 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             className="relative"
           >
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-40"></div>
-            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-xl p-2 bg-white border border-slate-100">
-              <img 
-                src={images[0] || placeholder("Personalized Learning")} 
-                alt="Children Learning" 
-                className={`rounded-[1.75rem] w-full h-auto object-cover transition-opacity duration-1000 ${loadingImages ? 'opacity-50' : 'opacity-100'}`}
-              />
+            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-xl p-2 bg-white border border-slate-100 aspect-video flex items-center justify-center group">
+                <AnimatePresence mode='wait'>
+                  <motion.img 
+                    key={images[0]}
+                    initial={{ opacity: 0.8 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8 }}
+                    src={images[0]} 
+                    alt="Children Learning" 
+                    className="rounded-[1.75rem] w-full h-full object-cover shadow-inner"
+                  />
+                </AnimatePresence>
+                {!isAiGenerated && (
+                  <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
+                    <Sparkles size={12} className="animate-pulse" />
+                    AI DESIGNING UNIQUE ART...
+                  </div>
+                )}
             </div>
           </motion.div>
         </div>
@@ -124,7 +198,16 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
           <motion.div {...fadeIn} className="order-2 lg:order-1 relative">
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] scale-105 -rotate-2"></div>
-            <img src={images[2] || placeholder("Guided Learning")} alt="Hints System" className="relative z-10 rounded-[2rem] shadow-xl" />
+            <div className="relative z-10 aspect-video rounded-[2rem] overflow-hidden shadow-xl bg-slate-100 flex items-center justify-center">
+               <motion.img 
+                key={images[2]}
+                initial={{ opacity: 0.5 }} 
+                animate={{ opacity: 1 }} 
+                src={images[2]} 
+                alt="Hints System" 
+                className="w-full h-full object-cover" 
+               />
+            </div>
           </motion.div>
           <motion.div {...fadeIn} className="order-1 lg:order-2">
             <div className="text-[#6C63FF] font-bold text-[10px] tracking-[0.2em] mb-2">GUIDED LEARNING SYSTEM</div>
@@ -152,13 +235,18 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">Each child gets their own personalized learning journey.</p>
           </motion.div>
           
-          <motion.div {...fadeIn} className="relative mb-12">
+          <motion.div {...fadeIn} className="relative mb-12 max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-transparent rounded-[2rem] -z-10 blur-xl"></div>
-            <img 
-              src={images[4] || placeholder("Multi-Child Dashboard")} 
-              alt="Multi-Child Showcase" 
-              className="rounded-[2rem] shadow-xl mx-auto border border-white max-w-4xl w-full"
-            />
+            <div className="aspect-video rounded-[2rem] overflow-hidden shadow-xl border border-white bg-slate-100 flex items-center justify-center">
+               <motion.img 
+                 key={images[4]}
+                 initial={{ opacity: 0.5 }}
+                 animate={{ opacity: 1 }}
+                 src={images[4]} 
+                 alt="Multi-Child Showcase" 
+                 className="w-full h-full object-cover"
+               />
+            </div>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -256,14 +344,14 @@ const StepCard = ({ step, color, icon, title, desc }: { step: number, color: str
   </motion.div>
 );
 
-const FeatureCard = ({ img, icon, title, desc }: { img?: string, icon: string, title: string, desc: string }) => (
+const FeatureCard = ({ img, icon, title, desc }: { img: string, icon: string, title: string, desc: string }) => (
   <motion.div 
     whileHover={{ y: -4 }}
     className="bg-white rounded-[1.5rem] overflow-hidden shadow-md shadow-slate-200/50 border border-slate-100 flex flex-col h-full"
   >
-    <div className="relative h-48 bg-slate-100">
-      <img src={img || `https://picsum.photos/seed/${title}/600/400`} alt={title} className="w-full h-full object-cover" />
-      <div className="absolute top-2 right-2 w-9 h-9 bg-white rounded-lg shadow-md flex items-center justify-center text-lg">
+    <div className="relative h-48 bg-slate-100 flex items-center justify-center">
+      <motion.img initial={{ opacity: 0.8 }} animate={{ opacity: 1 }} src={img} alt={title} className="w-full h-full object-cover" />
+      <div className="absolute top-2 right-2 w-9 h-9 bg-white rounded-lg shadow-md flex items-center justify-center text-lg z-10">
         {icon}
       </div>
     </div>
@@ -273,14 +361,4 @@ const FeatureCard = ({ img, icon, title, desc }: { img?: string, icon: string, t
       <button className="text-[#6C63FF] font-extrabold text-[10px] uppercase tracking-widest hover:underline">Learn More →</button>
     </div>
   </motion.div>
-);
-
-const PriceToggle = ({ label, price }: { label: string, price: string }) => (
-  <label className="flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 cursor-pointer hover:border-[#6C63FF] transition-all">
-    <input type="checkbox" className="w-4 h-4 accent-[#6C63FF]" />
-    <div>
-      <div className="font-extrabold text-xs">{label}</div>
-      <div className="text-[9px] text-[#6C63FF] font-bold uppercase tracking-widest">{price}</div>
-    </div>
-  </label>
 );
