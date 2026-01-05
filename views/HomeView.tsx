@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
@@ -22,7 +21,6 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
     loadImages();
   }, []);
 
-  // Fix: Explicitly cast 'ease' to 'as const' to ensure it is treated as a specific Easing literal rather than a generic string
   const fadeIn = {
     initial: { opacity: 0, y: 15 },
     whileInView: { opacity: 1, y: 0 },
@@ -34,7 +32,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
 
   return (
     <div className="w-full bg-[#F7F9FC]">
-      {/* Section 1: Hero Section - Paddings halved */}
+      {/* Section 1: Hero Section */}
       <section className="relative overflow-hidden pt-10 pb-16 md:pt-20 md:pb-26 bg-gradient-to-br from-[#F5F3FF] via-white to-white">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-8 items-center">
           <motion.div {...fadeIn} className="z-10 text-center lg:text-left">
@@ -42,7 +40,6 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
               <span className="bg-[#6C63FF] text-white text-[9px] px-1.5 py-0.5 rounded-full mr-1">50% OFF</span>
               <span>LEARN FROM TODAY</span>
             </div>
-            {/* Headline: Font size reduced by ~50%, and applied a new multi-color gradient */}
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-[1.2] mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] via-[#9333EA] to-[#DB2777]">
               Give Your K-5 Child Personalized Daily Learning Practice To Help Sharpen Their Skills
             </h1>
@@ -85,7 +82,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         </div>
       </section>
 
-      {/* Section 2: How It Works Section - Paddings and margins halved */}
+      {/* Section 2: How It Works */}
       <section className="py-12 md:py-16 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div {...fadeIn} className="text-center mb-10 md:mb-12">
@@ -94,7 +91,6 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
           </motion.div>
           
           <div className="relative flex flex-col md:flex-row justify-between items-center md:items-start gap-10 md:gap-4">
-            {/* Dashed Connector Line - Desktop Only */}
             <div className="absolute top-[30px] left-0 w-full h-0.5 border-t-2 border-dashed border-slate-100 hidden md:block z-0"></div>
             
             <StepCard step={1} color="bg-[#10B981]" icon={<Star className="w-6 h-6" />} title="Create Account" desc="Simple email signup to start your trial." />
@@ -106,7 +102,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         </div>
       </section>
 
-      {/* Section 3: Features Grid - Paddings halved */}
+      {/* Section 3: Features Grid */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div {...fadeIn} className="text-center mb-10">
@@ -123,7 +119,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         </div>
       </section>
 
-      {/* Section 4: Learning Support Spotlight - Paddings halved */}
+      {/* Section 4: Learning Support Spotlight */}
       <section className="py-16 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
           <motion.div {...fadeIn} className="order-2 lg:order-1 relative">
@@ -148,7 +144,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         </div>
       </section>
 
-      {/* Section 5: Multi-Child Management - Paddings halved */}
+      {/* Section 5: Multi-Child Management */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div {...fadeIn} className="text-center mb-10">
@@ -175,10 +171,10 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-white rounded-xl shadow-md flex items-center justify-center mx-auto mb-4 text-[#5DCEA0]">
-                <Database size={24} />
+                <Printer size={24} />
               </div>
-              <h3 className="text-xl font-extrabold text-[#1A1F3A] mb-2">Track Progress</h3>
-              <p className="text-slate-500 leading-relaxed font-medium text-sm">Individual reporting helps you see where each child excels.</p>
+              <h3 className="text-xl font-extrabold text-[#1A1F3A] mb-2">Screen-Free Focus</h3>
+              <p className="text-slate-500 leading-relaxed font-medium text-sm">Print daily worksheets to keep learning tactile and reduce total screen time.</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-white rounded-xl shadow-md flex items-center justify-center mx-auto mb-4 text-[#FFD97D]">
@@ -191,7 +187,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
         </div>
       </section>
 
-      {/* Section 6: Pricing Section - Paddings halved */}
+      {/* Section 6: Pricing Section */}
       <section className="py-16 bg-[#1A1F3A] text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-[#6C63FF]/5 -skew-x-12"></div>
         <div className="max-w-4xl mx-auto px-4 relative z-10">

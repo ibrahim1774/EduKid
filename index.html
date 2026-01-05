@@ -9,9 +9,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-        // Polyfill 'process' for browser environments (especially Vite on Vercel)
-        // to prevent blank screen crashes due to ReferenceError.
-        window.process = window.process || { env: {} };
+        // Critical: Polyfill process.env for browser compatibility in Vite/Vercel
+        window.process = {
+            env: {
+                API_KEY: "",
+                GEMINI_API_KEY: "" 
+            }
+        };
+        // Global error tracking for debugging deployment issues
+        window.onerror = function(msg, url, line, col, error) {
+            console.error("Global Error: " + msg + " at " + url + ":" + line);
+        };
     </script>
     <style>
         body {
@@ -38,6 +46,27 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+        /* Custom scrollbar for better aesthetics */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #CBD5E1;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 <script type="importmap">
 {
@@ -54,5 +83,7 @@
 </head>
 <body class="text-[#1A1F3A] overflow-x-hidden">
     <div id="root"></div>
+    <!-- Explicit module entry point to ensure loading -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
