@@ -1,0 +1,175 @@
+import React, { useState, useEffect } from 'react';
+import { Worksheet, Question } from '../types';
+import { ArrowLeft, Printer, Download, Sparkles, FileText, CheckCircle, Star, Key } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+interface WorksheetViewProps {
+  worksheet: Worksheet;
+  onBack: () => void;
+  initialShowAnswerKey?: boolean;
+}
+
+export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack, initialShowAnswerKey = false }) => {
+  const [showAnswerKey, setShowAnswerKey] = useState(initialShowAnswerKey);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#F0F2F5] py-4 md:py-16 px-2 md:px-4 overflow-y-auto">
+      {/* Navigation & Actions */}
+      <div className="max-w-[21cm] mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 no-print">
+        <button onClick={onBack} className="flex items-center gap-3 text-slate-500 hover:text-[#6C63FF] font-extrabold transition-colors w-full md:w-auto">
+          <ArrowLeft size={24} /> <span>Back to Dashboard</span>
+        </button>
+        <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto">
+          <button 
+            onClick={() => setShowAnswerKey(!showAnswerKey)}
+            className={`flex-1 md:flex-none px-4 md:px-8 py-3 md:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 ${showAnswerKey ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+          >
+            <Key size={20} /> <span className="whitespace-nowrap">{showAnswerKey ? 'Hide Answers' : 'Answer Key'}</span>
+          </button>
+          <button 
+            onClick={() => window.print()}
+            className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+          >
+            <Printer size={20} /> <span className="whitespace-nowrap">Print</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Premium Worksheet Paper */}
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="max-w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl p-6 md:p-24 rounded-2xl md:rounded-[3rem] border border-slate-100 relative print:shadow-none print:border-none print:p-0 print:rounded-none print:max-w-none overflow-x-hidden"
+      >
+        {/* Branding Decor */}
+        <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-[#6C63FF] via-[#A599FF] to-[#5DCEA0] rounded-t-2xl md:rounded-t-[3rem] no-print"></div>
+
+        {/* Paper Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-10 md:mb-16 border-b-2 border-slate-50 pb-8 md:pb-12">
+          <div className="w-full md:w-auto">
+            <div className="flex items-center gap-2 md:gap-3 text-[#6C63FF] font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 md:mb-3">
+              <FileText size={16} /> Daily {worksheet.subject} Practice
+            </div>
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-[#1A1F3A] leading-tight mb-2 uppercase tracking-tighter break-words">
+              {worksheet.title} {showAnswerKey && <span className="text-amber-500">(ANSWER KEY)</span>}
+            </h1>
+            <div className="flex items-center flex-wrap gap-2 md:gap-4 text-slate-400 font-bold text-xs md:text-sm">
+              <span className="bg-slate-50 px-2 md:px-3 py-1 rounded-lg">{worksheet.grade}</span>
+              <span className="w-1 md:w-1.5 h-1 md:h-1.5 bg-slate-200 rounded-full" />
+              <span>{worksheet.date}</span>
+              <span className="w-1 md:w-1.5 h-1 md:h-1.5 bg-slate-200 rounded-full" />
+              <span className="text-indigo-400 font-extrabold truncate max-w-[150px] md:max-w-none">Student: ____________________</span>
+            </div>
+          </div>
+          <div className="text-right hidden md:block">
+            <div className="w-16 md:w-20 h-16 md:h-20 border-2 border-dashed border-slate-100 rounded-2xl md:rounded-3xl flex items-center justify-center mb-2">
+              <div className="w-8 md:w-10 h-8 md:h-10 bg-[#6C63FF] rounded-xl" />
+            </div>
+            <p className="text-[10px] text-slate-300 font-extrabold uppercase tracking-widest">EduKid Learning Platform</p>
+          </div>
+        </div>
+
+        {/* Instructions Box */}
+        <div className="mb-10 md:mb-20 bg-indigo-50/40 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-indigo-100/50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+            <Sparkles size={80} />
+          </div>
+          <p className="text-[10px] md:text-sm font-extrabold text-[#6C63FF] uppercase tracking-widest mb-2 md:mb-3 flex items-center gap-2">
+            <Sparkles size={14} /> Instructions
+          </p>
+          <p className="text-base md:text-xl text-indigo-900 leading-relaxed font-medium italic">
+            "{worksheet.instructions}"
+          </p>
+        </div>
+
+        {/* Problems List */}
+        <div className="space-y-12 md:space-y-24">
+          {worksheet.questions.map((q, idx) => (
+            <div key={q.id} className="relative group">
+              <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
+                {/* Number Badge */}
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-[#1A1F3A] text-white rounded-xl md:rounded-2xl flex items-center justify-center font-extrabold text-lg md:text-xl shrink-0 shadow-lg mt-1">
+                  {idx + 1}
+                </div>
+                
+                <div className="flex-grow space-y-6 md:space-y-10 w-full overflow-hidden">
+                  <h3 className="text-xl md:text-3xl font-extrabold text-[#1A1F3A] leading-tight pt-1 break-words">
+                    {q.text}
+                  </h3>
+                  
+                  {/* Subject Specific Inputs */}
+                  {q.type === 'multiple-choice' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+                      {q.options?.map((opt, i) => (
+                        <div key={i} className={`flex items-center gap-4 md:gap-6 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl transition-all ${showAnswerKey && opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
+                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
+                          <span className={`text-base md:text-xl font-bold ${showAnswerKey && opt === q.correctAnswer ? 'text-emerald-700' : 'text-slate-700'}`}>{opt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {q.type === 'text' && (
+                    <div className="w-full space-y-4">
+                       <div className="w-full min-h-[6rem] md:min-h-[10rem] border-2 border-dashed border-slate-100 rounded-2xl md:rounded-[2rem] bg-slate-50/30 flex items-center justify-center p-4 md:p-8">
+                          {showAnswerKey ? (
+                            <span className="text-emerald-600 font-extrabold text-lg md:text-2xl italic text-center">Correct Answer: {q.correctAnswer}</span>
+                          ) : (
+                            <div className="w-full h-full border-b-2 border-slate-100 relative top-2 md:top-4" />
+                          )}
+                       </div>
+                    </div>
+                  )}
+
+                  {q.type === 'true-false' && (
+                    <div className="flex flex-col sm:flex-row gap-4 md:gap-10">
+                       <div className={`flex items-center gap-4 p-4 md:p-8 border-2 rounded-2xl md:rounded-3xl min-w-[120px] md:min-w-[160px] justify-center ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
+                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
+                          <span className={`font-extrabold text-lg md:text-xl ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'text-emerald-700' : 'text-slate-700'}`}>TRUE</span>
+                       </div>
+                       <div className={`flex items-center gap-4 p-4 md:p-8 border-2 rounded-2xl md:rounded-3xl min-w-[120px] md:min-w-[160px] justify-center ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
+                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
+                          <span className={`font-extrabold text-lg md:text-xl ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'text-emerald-700' : 'text-slate-700'}`}>FALSE</span>
+                       </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Divider Decor */}
+              {idx < worksheet.questions.length - 1 && (
+                <div className="mt-10 md:mt-20 h-px bg-slate-50 w-full" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Paper Footer */}
+        <div className="mt-20 md:mt-32 pt-8 md:pt-12 border-t-2 border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-slate-300 font-extrabold text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em]">
+          <div className="flex items-center gap-2 md:gap-3">
+             <CheckCircle size={12} className="text-[#5DCEA0]" /> Verified Content
+          </div>
+          <span className="text-center">© 2024 EduKid Learning Platform</span>
+          <div className="flex items-center gap-2">
+             Page 01 of 01
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Encouragement Toast */}
+      <div className="fixed bottom-4 left-4 hidden md:flex items-center gap-4 bg-[#1A1F3A] text-white p-5 rounded-3xl shadow-2xl no-print animate-in slide-in-from-left-20">
+         <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center">
+            <Star size={24} fill="currentColor" />
+         </div>
+         <div>
+            <p className="font-bold text-sm">Keep it up!</p>
+            <p className="text-[10px] opacity-60 font-bold uppercase tracking-widest">Progress starts here</p>
+         </div>
+      </div>
+    </div>
+  );
+};
