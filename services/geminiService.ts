@@ -1,9 +1,8 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Grade, Subject, Worksheet, Question } from "../types";
 
-// Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Using GEMINI_API_KEY as the environment variable for Vercel deployment
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
  * Generates brand illustrations.
@@ -30,7 +29,6 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
       }
     });
 
-    // Extracting image part from candidates as per guidelines
     const parts = response.candidates?.[0]?.content?.parts;
     if (parts) {
       for (const part of parts) {
@@ -86,7 +84,6 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
   });
 
   try {
-    // Correctly using response.text property as per guidelines
     const data = JSON.parse(response.text.trim() || '{}');
     return {
       title: data.title,
@@ -106,7 +103,6 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
 
 /**
  * Provides pedagogical support for the student using the TutorView.
- * Uses gemini-3-pro-preview for complex reasoning and explanation tasks.
  */
 export const getTutorExplanation = async (userQuestion: string, context: string, grade: Grade): Promise<string> => {
   const prompt = `You are a friendly, patient, and highly encouraging learning assistant for a child in ${grade}.

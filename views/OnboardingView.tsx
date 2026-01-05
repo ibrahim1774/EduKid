@@ -22,6 +22,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
     name: '',
     age: 7,
     grade: Grade.G2,
+    // All subjects are included by default now
     subjects: [Subject.Math, Subject.Reading, Subject.Writing, Subject.Science, Subject.History],
     learningNeeds: { [Subject.Math]: [], [Subject.Reading]: [], [Subject.Writing]: [], [Subject.Science]: [], [Subject.History]: [] },
     preferences: {
@@ -182,19 +183,19 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                 </div>
                 
                 <div className="grid gap-3">
-                  <StaticSubjectItem label="Mathematics" icon={<BookOpen size={20} />} />
-                  <StaticSubjectItem label="Reading" icon={<FileText size={20} />} />
-                  <StaticSubjectItem label="Writing" icon={<FileText size={20} />} />
-                  <StaticSubjectItem label="Science" icon={<Sparkles size={20} />} />
-                  <StaticSubjectItem label="History" icon={<Clock size={20} />} />
+                  <StaticCurriculumItem label="Math" icon={<BookOpen size={20} />} />
+                  <StaticCurriculumItem label="Reading" icon={<FileText size={20} />} />
+                  <StaticCurriculumItem label="Writing" icon={<FileText size={20} />} />
+                  <StaticCurriculumItem label="Science" icon={<Sparkles size={20} />} />
+                  <StaticCurriculumItem label="History" icon={<Clock size={20} />} />
                 </div>
 
-                <div className="bg-[#1A1F3A] p-6 md:p-8 rounded-3xl text-white flex justify-between items-center mt-6">
+                <div className="bg-indigo-50 p-6 md:p-8 rounded-3xl border border-indigo-100 flex justify-between items-center mt-6">
                   <div>
-                    <h4 className="font-bold opacity-60 text-xs uppercase tracking-widest mb-1">Monthly Plan</h4>
-                    <p className="text-[10px] text-indigo-200">3 Day Free Trial • All Curriculum Included</p>
+                    <h4 className="font-bold text-indigo-900 text-sm uppercase tracking-widest mb-1">Plan Overview</h4>
+                    <p className="text-xs text-indigo-600 font-medium italic">All curriculum areas included in your 3-day free trial</p>
                   </div>
-                  <div className="text-3xl md:text-4xl font-extrabold">$10</div>
+                  <div className="text-2xl font-extrabold text-[#6C63FF]">$10/mo</div>
                 </div>
 
                 <div className="flex gap-4">
@@ -214,7 +215,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                 <div className="space-y-4">
                   <ReviewItem label="Child Profile" value={`${childData.name}, Age ${childData.age}, ${childData.grade}`} onEdit={() => setStep(1)} />
                   <ReviewItem label="Learning Needs" value={Object.values(childData.learningNeeds || {}).flat().slice(0, 3).join(', ') + (Object.values(childData.learningNeeds || {}).flat().length > 3 ? '...' : '')} onEdit={() => setStep(2)} />
-                  <ReviewItem label="Plan" value={`Full Access ($10/mo)`} onEdit={() => setStep(3)} />
+                  <ReviewItem label="Plan" value={`Full Curriculum Access`} onEdit={() => setStep(3)} />
                 </div>
 
                 <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 flex items-start gap-4">
@@ -223,7 +224,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   </div>
                   <div>
                     <h4 className="font-bold text-emerald-900 text-sm">3 Day Free Trial Starts Now</h4>
-                    <p className="text-xs text-emerald-700 leading-relaxed">No charge until trial ends. Cancel anytime in settings.</p>
+                    <p className="text-xs text-emerald-700 leading-relaxed">Cancel anytime in settings.</p>
                   </div>
                 </div>
 
@@ -240,17 +241,17 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
   );
 };
 
-const StaticSubjectItem = ({ label, icon }: { label: string, icon: React.ReactNode }) => (
-  <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-center justify-between">
+const StaticCurriculumItem = ({ label, icon }: { label: string, icon: React.ReactNode }) => (
+  <div className="p-5 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center justify-between">
     <div className="flex items-center gap-4">
       <div className="w-10 h-10 bg-indigo-50 text-[#6C63FF] rounded-xl flex items-center justify-center">
         {icon}
       </div>
-      <h4 className="font-bold text-slate-700">{label}</h4>
+      <h4 className="font-bold text-slate-700 text-lg">{label}</h4>
     </div>
-    <div className="flex items-center gap-1.5 text-emerald-500">
-      <Check size={16} strokeWidth={3} />
-      <span className="text-[10px] font-bold uppercase tracking-widest">Available</span>
+    <div className="flex items-center gap-2 text-indigo-500/50">
+      <Check size={18} strokeWidth={3} />
+      <span className="text-[10px] font-bold uppercase tracking-widest">Included</span>
     </div>
   </div>
 );

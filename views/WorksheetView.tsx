@@ -13,26 +13,27 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
   const [showAnswerKey, setShowAnswerKey] = useState(initialShowAnswerKey);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Ensure view starts at top when opened
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] py-4 md:py-16 px-2 md:px-4 overflow-y-auto">
+    <div className="min-h-screen bg-[#F0F2F5] py-4 md:py-16 px-2 md:px-4">
       {/* Navigation & Actions */}
       <div className="max-w-[21cm] mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 no-print">
-        <button onClick={onBack} className="flex items-center gap-3 text-slate-500 hover:text-[#6C63FF] font-extrabold transition-colors w-full md:w-auto">
+        <button onClick={onBack} className="flex items-center gap-3 text-slate-500 hover:text-[#6C63FF] font-extrabold transition-colors w-full md:w-auto p-2">
           <ArrowLeft size={24} /> <span>Back to Dashboard</span>
         </button>
         <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto">
           <button 
             onClick={() => setShowAnswerKey(!showAnswerKey)}
-            className={`flex-1 md:flex-none px-4 md:px-8 py-3 md:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 ${showAnswerKey ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+            className={`flex-1 md:flex-none px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 ${showAnswerKey ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
           >
             <Key size={20} /> <span className="whitespace-nowrap">{showAnswerKey ? 'Hide Answers' : 'Answer Key'}</span>
           </button>
           <button 
             onClick={() => window.print()}
-            className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+            className="flex-1 md:flex-none px-6 md:px-8 py-3 md:py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
           >
             <Printer size={20} /> <span className="whitespace-nowrap">Print</span>
           </button>
@@ -43,13 +44,13 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="max-w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl p-6 md:p-24 rounded-2xl md:rounded-[3rem] border border-slate-100 relative print:shadow-none print:border-none print:p-0 print:rounded-none print:max-w-none overflow-x-hidden"
+        className="max-w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl p-6 md:p-24 rounded-2xl md:rounded-[3rem] border border-slate-100 relative print:shadow-none print:border-none print:p-0 print:rounded-none print:max-w-none overflow-x-hidden flex flex-col h-auto"
       >
         {/* Branding Decor */}
         <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-[#6C63FF] via-[#A599FF] to-[#5DCEA0] rounded-t-2xl md:rounded-t-[3rem] no-print"></div>
 
         {/* Paper Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-10 md:mb-16 border-b-2 border-slate-50 pb-8 md:pb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-10 md:mb-16 border-b-2 border-slate-50 pb-8 md:pb-12 shrink-0">
           <div className="w-full md:w-auto">
             <div className="flex items-center gap-2 md:gap-3 text-[#6C63FF] font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 md:mb-3">
               <FileText size={16} /> Daily {worksheet.subject} Practice
@@ -74,7 +75,7 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
         </div>
 
         {/* Instructions Box */}
-        <div className="mb-10 md:mb-20 bg-indigo-50/40 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-indigo-100/50 relative overflow-hidden">
+        <div className="mb-10 md:mb-20 bg-indigo-50/40 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-indigo-100/50 relative overflow-hidden shrink-0">
           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Sparkles size={80} />
           </div>
@@ -86,8 +87,8 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
           </p>
         </div>
 
-        {/* Problems List */}
-        <div className="space-y-12 md:space-y-24">
+        {/* Problems List - h-auto ensures no cut-off */}
+        <div className="space-y-12 md:space-y-24 flex-grow h-auto">
           {worksheet.questions.map((q, idx) => (
             <div key={q.id} className="relative group">
               <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
@@ -96,7 +97,7 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
                   {idx + 1}
                 </div>
                 
-                <div className="flex-grow space-y-6 md:space-y-10 w-full overflow-hidden">
+                <div className="flex-grow space-y-6 md:space-y-10 w-full">
                   <h3 className="text-xl md:text-3xl font-extrabold text-[#1A1F3A] leading-tight pt-1 break-words">
                     {q.text}
                   </h3>
@@ -149,7 +150,7 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
         </div>
 
         {/* Paper Footer */}
-        <div className="mt-20 md:mt-32 pt-8 md:pt-12 border-t-2 border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-slate-300 font-extrabold text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em]">
+        <div className="mt-20 md:mt-32 pt-8 md:pt-12 border-t-2 border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-slate-300 font-extrabold text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] shrink-0">
           <div className="flex items-center gap-2 md:gap-3">
              <CheckCircle size={12} className="text-[#5DCEA0]" /> Verified Content
           </div>
@@ -161,7 +162,7 @@ export const WorksheetView: React.FC<WorksheetViewProps> = ({ worksheet, onBack,
       </motion.div>
 
       {/* Encouragement Toast */}
-      <div className="fixed bottom-4 left-4 hidden md:flex items-center gap-4 bg-[#1A1F3A] text-white p-5 rounded-3xl shadow-2xl no-print animate-in slide-in-from-left-20">
+      <div className="fixed bottom-4 left-4 hidden lg:flex items-center gap-4 bg-[#1A1F3A] text-white p-5 rounded-3xl shadow-2xl no-print animate-in slide-in-from-left-20">
          <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center">
             <Star size={24} fill="currentColor" />
          </div>
