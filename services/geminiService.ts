@@ -6,9 +6,9 @@ import { Grade, Subject, Worksheet, Question } from "../types";
  * Hyper-realistic, human-centric learning scenes.
  */
 export const generateAppImage = async (promptId: number): Promise<string> => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
-    console.warn("API_KEY not found in process.env. Images may not load.");
+    console.warn("VITE_GEMINI_API_KEY not found in import.meta.env. Images may not load.");
   }
 
   const ai = new GoogleGenAI({ apiKey: apiKey || "" });
@@ -52,7 +52,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
  * Generates a full worksheet based on child's grade and subject.
  */
 export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject, struggles?: string): Promise<Partial<Worksheet>> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
   const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
   ${struggles ? `CRITICAL: The student is specifically struggling with: "${struggles}". Please include several targeted problems and clear examples addressing this struggle.` : 'Focus on grade-appropriate challenges.'}
@@ -111,7 +111,7 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
  * Provides pedagogical support for the student using the TutorView.
  */
 export const getTutorExplanation = async (userQuestion: string, context: string, grade: Grade): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+  const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
   const prompt = `You are a friendly, patient, and highly encouraging learning assistant for a child in ${grade}.
   
   CONTEXT:
