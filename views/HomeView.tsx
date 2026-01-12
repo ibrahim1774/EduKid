@@ -6,84 +6,21 @@ import { Link, useNavigate } from 'react-router-dom';
 
 // Fast-loading, high-quality defaults for immediate first-paint
 const DEFAULT_IMAGES = [
-  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1200", // Hero
-  "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=800",  // Feature 1
-  "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",  // Feature 2
-  "https://images.unsplash.com/photo-1454165833767-027ffea9e77b?auto=format&fit=crop&q=80&w=800",  // Feature 3
-  "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=1200", // Showcase
-  "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&q=80&w=800"   // Feature 4
+  "/assets/images/hero.png",
+  "/assets/images/fresh-practice.png",
+  "/assets/images/hints.png",
+  "/assets/images/printable.png",
+  "/assets/images/family.png",
+  "/assets/images/custom-plans.png"
 ];
-
-const DB_NAME = 'edukid_assets';
-const STORE_NAME = 'brand_images';
-
-// Helper for IndexedDB as localStorage is too small for images
-const getCachedImages = (): Promise<string[] | null> => {
-  return new Promise((resolve) => {
-    try {
-      const request = indexedDB.open(DB_NAME, 1);
-      request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
-      request.onsuccess = () => {
-        const db = request.result;
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const getReq = store.get('brand_set');
-        getReq.onsuccess = () => resolve(getReq.result || null);
-        getReq.onerror = () => resolve(null);
-      };
-      request.onerror = () => resolve(null);
-    } catch (e) {
-      resolve(null);
-    }
-  });
-};
-
-const cacheImages = (urls: string[]): Promise<void> => {
-  return new Promise((resolve) => {
-    try {
-      const request = indexedDB.open(DB_NAME, 1);
-      request.onupgradeneeded = () => request.result.createObjectStore(STORE_NAME);
-      request.onsuccess = () => {
-        const db = request.result;
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.put(urls, 'brand_set');
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => resolve();
-      };
-      request.onerror = () => resolve();
-    } catch (e) {
-      resolve();
-    }
-  });
-};
 
 export const HomeView: React.FC = () => {
   const navigate = useNavigate();
-  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
-  const [isAiGenerated, setIsAiGenerated] = useState(false);
+  const [images] = useState<string[]>(DEFAULT_IMAGES);
+  const isAiGenerated = true;
 
   useEffect(() => {
-    const loadImages = async () => {
-      // 1. Check IndexedDB for existing AI assets (No 5MB limit here)
-      const cached = await getCachedImages();
-      if (cached && Array.isArray(cached) && cached.length === 6) {
-        setImages(cached);
-        setIsAiGenerated(true);
-        return;
-      }
-
-      // 2. Background generate if not found (or if previous storage failed)
-      try {
-        const urls = await Promise.all([0, 1, 2, 3, 4, 5].map(id => generateAppImage(id)));
-        setImages(urls);
-        setIsAiGenerated(true);
-        await cacheImages(urls); // Uses IndexedDB for much larger quota
-      } catch (err) {
-        console.error("Background AI generation failed, using high-quality defaults:", err);
-      }
-    };
-    loadImages();
+    // Images are now static for performance and consistency
   }, []);
 
   const fadeIn = {
