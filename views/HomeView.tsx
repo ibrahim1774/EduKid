@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
 import { generateAppImage } from '../services/geminiService';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Fast-loading, high-quality defaults for immediate first-paint
 const DEFAULT_IMAGES = [
@@ -57,7 +58,8 @@ const cacheImages = (urls: string[]): Promise<void> => {
   });
 };
 
-export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = ({ onStart, onLogin }) => {
+export const HomeView: React.FC = () => {
+  const navigate = useNavigate();
   const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
   const [isAiGenerated, setIsAiGenerated] = useState(false);
 
@@ -108,8 +110,8 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
               Daily worksheets in various subjects — tailored to their exact grade level. Print, practice, & help your child succeed
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-              <button 
-                onClick={onStart}
+              <button
+                onClick={() => navigate('/get-started')}
                 className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
               >
                 Start 3 Day Free Trial <ArrowRight size={20} />
@@ -124,8 +126,8 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
               <div className="flex items-center gap-2">⭐ 4.9/5 Rating</div>
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, scale: 0.95, rotate: 2 }}
             animate={{ opacity: 1, scale: 1, rotate: 1 }}
             transition={{ duration: 0.8, delay: 0.1 }}
@@ -133,24 +135,24 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
           >
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-40"></div>
             <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-xl p-2 bg-white border border-slate-100 aspect-video flex items-center justify-center group">
-                <AnimatePresence mode='wait'>
-                  <motion.img 
-                    key={images[0]}
-                    initial={{ opacity: 0.8 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8 }}
-                    src={images[0]} 
-                    alt="Children Learning" 
-                    className="rounded-[1.75rem] w-full h-full object-cover shadow-inner"
-                  />
-                </AnimatePresence>
-                {!isAiGenerated && (
-                  <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
-                    <Sparkles size={12} className="animate-pulse" />
-                    AI DESIGNING UNIQUE ART...
-                  </div>
-                )}
+              <AnimatePresence mode='wait'>
+                <motion.img
+                  key={images[0]}
+                  initial={{ opacity: 0.8 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                  src={images[0]}
+                  alt="Children Learning"
+                  className="rounded-[1.75rem] w-full h-full object-cover shadow-inner"
+                />
+              </AnimatePresence>
+              {!isAiGenerated && (
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
+                  <Sparkles size={12} className="animate-pulse" />
+                  AI DESIGNING UNIQUE ART...
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
@@ -163,10 +165,10 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             <h2 className="text-3xl md:text-5xl font-extrabold text-[#1A1F3A] mb-3 tracking-tight">How It Works</h2>
             <p className="text-lg md:text-xl text-slate-500 max-w-xl mx-auto font-medium leading-relaxed">Get started in less than 5 minutes and transform your morning routine.</p>
           </motion.div>
-          
+
           <div className="relative flex flex-col md:flex-row justify-between items-center md:items-start gap-10 md:gap-4">
             <div className="absolute top-[30px] left-0 w-full h-0.5 border-t-2 border-dashed border-slate-100 hidden md:block z-0"></div>
-            
+
             <StepCard step={1} color="bg-[#10B981]" icon={<Star className="w-6 h-6" />} title="Create Account" desc="Simple email signup to start your trial." />
             <StepCard step={2} color="bg-[#EC4899]" icon={<Users className="w-6 h-6" />} title="Profile Setup" desc="Enter name, age, and grade." />
             <StepCard step={3} color="bg-[#6366F1]" icon={<Target className="w-6 h-6" />} title="Focus Areas" desc="Target where your child needs help most." />
@@ -183,7 +185,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-3">Everything for Daily Learning</h2>
             <p className="text-lg text-slate-500">Premium features designed for consistent learning growth.</p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <FeatureCard img={images[1]} icon="📅" title="Fresh Practice" desc="Daily worksheets matched perfectly to grade and focus." />
             <FeatureCard img={images[2]} icon="💡" title="Helpful Hints" desc="Built-in guidance to help your child understand the 'why'." />
@@ -199,14 +201,14 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
           <motion.div {...fadeIn} className="order-2 lg:order-1 relative">
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] scale-105 -rotate-2"></div>
             <div className="relative z-10 aspect-video rounded-[2rem] overflow-hidden shadow-xl bg-slate-100 flex items-center justify-center">
-               <motion.img 
+              <motion.img
                 key={images[2]}
-                initial={{ opacity: 0.5 }} 
-                animate={{ opacity: 1 }} 
-                src={images[2]} 
-                alt="Hints System" 
-                className="w-full h-full object-cover" 
-               />
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                src={images[2]}
+                alt="Hints System"
+                className="w-full h-full object-cover"
+              />
             </div>
           </motion.div>
           <motion.div {...fadeIn} className="order-1 lg:order-2">
@@ -219,7 +221,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
                 <li className="flex items-center gap-2"><div className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0"><Check size={12} /></div> Step-by-step concept breakdowns</li>
                 <li className="flex items-center gap-2"><div className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0"><Check size={12} /></div> Independent confidence building</li>
               </ul>
-              <button onClick={onStart} className="bg-[#5DCEA0] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-emerald-100 transition-all mt-4">
+              <button onClick={() => navigate('/get-started')} className="bg-[#5DCEA0] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-emerald-100 transition-all mt-4">
                 See Sample Worksheets
               </button>
             </div>
@@ -234,18 +236,18 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-3">Built for Families</h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">Each child gets their own personalized learning journey.</p>
           </motion.div>
-          
+
           <motion.div {...fadeIn} className="relative mb-12 max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-transparent rounded-[2rem] -z-10 blur-xl"></div>
             <div className="aspect-video rounded-[2rem] overflow-hidden shadow-xl border border-white bg-slate-100 flex items-center justify-center">
-               <motion.img 
-                 key={images[4]}
-                 initial={{ opacity: 0.5 }}
-                 animate={{ opacity: 1 }}
-                 src={images[4]} 
-                 alt="Multi-Child Showcase" 
-                 className="w-full h-full object-cover"
-               />
+              <motion.img
+                key={images[4]}
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                src={images[4]}
+                alt="Multi-Child Showcase"
+                className="w-full h-full object-cover"
+              />
             </div>
           </motion.div>
 
@@ -283,8 +285,8 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
             <h2 className="text-3xl md:text-5xl font-extrabold mb-3">Simple Pricing</h2>
             <p className="text-lg text-indigo-200">Start with essentials. Add subjects as you go.</p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             whileHover={{ y: -4 }}
             className="bg-white rounded-[2rem] p-8 md:p-12 text-[#1A1F3A] shadow-2xl relative"
           >
@@ -301,7 +303,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">per child / month</div>
               </div>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               <ul className="space-y-3">
                 <li className="flex items-center gap-2 font-bold text-slate-700 text-sm"><CheckCircle className="text-emerald-500" size={16} /> Daily Math & Reading</li>
@@ -315,7 +317,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
               </ul>
             </div>
 
-            <button onClick={onStart} className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all">
+            <button onClick={() => navigate('/get-started')} className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all">
               Start 3 Day Free Trial
             </button>
             <p className="mt-4 text-center text-slate-400 font-bold text-xs uppercase tracking-wide">Cancel anytime</p>
@@ -327,7 +329,7 @@ export const HomeView: React.FC<{ onStart: () => void, onLogin: () => void }> = 
 };
 
 const StepCard = ({ step, color, icon, title, desc }: { step: number, color: string, icon: any, title: string, desc: string }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 10 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -345,7 +347,7 @@ const StepCard = ({ step, color, icon, title, desc }: { step: number, color: str
 );
 
 const FeatureCard = ({ img, icon, title, desc }: { img: string, icon: string, title: string, desc: string }) => (
-  <motion.div 
+  <motion.div
     whileHover={{ y: -4 }}
     className="bg-white rounded-[1.5rem] overflow-hidden shadow-md shadow-slate-200/50 border border-slate-100 flex flex-col h-full"
   >

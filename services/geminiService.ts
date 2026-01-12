@@ -10,7 +10,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
   if (!apiKey) {
     console.warn("API_KEY not found in process.env. Images may not load.");
   }
-  
+
   const ai = new GoogleGenAI({ apiKey: apiKey || "" });
   const prompts = [
     "Hyper-realistic 8k professional photograph of a young child with soft curly hair and a blue knit sweater, looking at a modern white tablet with an expression of pure joy and wonder. The room is filled with soft, warm afternoon sunlight. High-detail skin textures, authentic expression, cinematic depth of field, masterpiece quality.",
@@ -51,11 +51,12 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
 /**
  * Generates a full worksheet based on child's grade and subject.
  */
-export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject): Promise<Partial<Worksheet>> => {
+export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject, struggles?: string): Promise<Partial<Worksheet>> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
   const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
-  Focus on grade-appropriate challenges. Include 10-15 varied problems.
+  ${struggles ? `CRITICAL: The student is specifically struggling with: "${struggles}". Please include several targeted problems and clear examples addressing this struggle.` : 'Focus on grade-appropriate challenges.'}
+  Include 10-15 varied problems.
   Return as valid JSON with title, instructions, and questions array.`;
 
   const response = await ai.models.generateContent({

@@ -1,64 +1,66 @@
 import React, { useState } from 'react';
-import { Child, Grade, Subject, LearningNeeds, ParentPreferences } from '../types';
-import { ChevronRight, ArrowLeft, Check, Star, Settings, Shield, User, Sparkles, BookOpen, Clock, FileText } from 'lucide-react';
+import { Child, Grade, Subject } from '../types';
+import { ChevronRight, ArrowLeft, Check, Star, Shield, User, Sparkles, BookOpen, Clock, FileText, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface OnboardingProps {
-  onComplete: (child: Child) => void;
+  onComplete: (child: any) => void;
   user: { email: string };
 }
 
-const TOPICS_BY_SUBJECT: Record<Subject, string[]> = {
-  [Subject.Math]: ["Addition & Subtraction", "Multiplication & Division", "Word Problems", "Fractions & Decimals", "Geometry", "Time & Money"],
-  [Subject.Reading]: ["Phonics", "Comprehension", "Vocabulary", "Spelling", "Fluency"],
-  [Subject.Writing]: ["Handwriting", "Sentence Structure", "Paragraph Writing", "Creative Writing", "Grammar"],
-  [Subject.Science]: ["Life Science", "Earth Science", "Physical Science", "Scientific Method"],
-  [Subject.History]: ["Ancient Civilizations", "Local History", "Historical Figures", "Time Periods", "Cultural Heritage"]
-};
-
-export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) => {
+export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [childData, setChildData] = useState<Partial<Child>>({
+  const [loading, setLoading] = useState(false);
+  const [childData, setChildData] = useState({
     name: '',
     age: 7,
     grade: Grade.G2,
-    // All subjects are included by default now
     subjects: [Subject.Math, Subject.Reading, Subject.Writing, Subject.Science, Subject.History],
-    learningNeeds: { [Subject.Math]: [], [Subject.Reading]: [], [Subject.Writing]: [], [Subject.Science]: [], [Subject.History]: [] },
-    preferences: {
-      autoGenerate: true,
-      generationTime: '06:00',
-      notifications: { dailyReady: true, weeklyProgress: true },
-      voiceEnabled: true,
-      voiceSpeed: 1.0
-    }
+    struggles: '',
   });
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
-  const toggleNeed = (subject: Subject, topic: string) => {
-    setChildData(prev => {
-      const currentNeeds = prev.learningNeeds?.[subject] || [];
-      const updatedNeeds = currentNeeds.includes(topic)
-        ? currentNeeds.filter(t => t !== topic)
-        : [...currentNeeds, topic];
-      return {
-        ...prev,
-        learningNeeds: { ...prev.learningNeeds, [subject]: updatedNeeds }
-      };
-    });
-  };
+  const handleFinish = async () => {
+    if (!user) return;
+    setLoading(true);
 
-  const handleFinish = () => {
-    onComplete({
-      ...(childData as Child),
-      id: Math.random().toString(36).substr(2, 9)
-    });
+    try {
+      const { data, error } = await supabase
+        .from('children')
+        .insert([
+          {
+            user_id: user.id,
+            name: childData.name,
+            age: childData.age,
+            grade: childData.grade,
+            interests: [], // Can add interests step later if needed
+            struggles: childData.struggles,
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      onComplete(data);
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error('Error saving child profile:', err);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F3FF] to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#F5F3FF] to-white py-12 px-4 font-sans">
       {/* Progress Header */}
       <div className="max-w-xl mx-auto mb-12">
         <div className="flex items-center justify-between mb-4">
@@ -66,7 +68,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
           <span className="text-sm font-medium text-slate-400">Progress: {Math.round((step / 4) * 100)}%</span>
         </div>
         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-          <motion.div 
+          <motion.div
             className="h-full bg-[#6C63FF]"
             initial={{ width: 0 }}
             animate={{ width: `${(step / 4) * 100}%` }}
@@ -76,7 +78,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
 
       <div className="max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
-          <motion.div 
+          <motion.div
             key={step}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -92,14 +94,14 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   <h2 className="text-2xl md:text-4xl font-extrabold text-[#1A1F3A] mb-3">Let's Get to Know Your Child</h2>
                   <p className="text-slate-500 font-medium">We'll create a personalized learning plan that grows with them.</p>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div>
                     <label className="text-sm font-bold text-slate-700 block mb-2">Child's First Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={childData.name}
-                      onChange={(e) => setChildData({...childData, name: e.target.value})}
+                      onChange={(e) => setChildData({ ...childData, name: e.target.value })}
                       placeholder="e.g. Emma"
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 focus:ring-4 focus:ring-[#6C63FF]/10 text-xl font-bold transition-all outline-none"
                     />
@@ -107,19 +109,19 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="text-sm font-bold text-slate-700 block mb-2">Age</label>
-                      <select 
+                      <select
                         value={childData.age}
-                        onChange={(e) => setChildData({...childData, age: parseInt(e.target.value)})}
+                        onChange={(e) => setChildData({ ...childData, age: parseInt(e.target.value) })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 font-bold"
                       >
-                        {[4,5,6,7,8,9,10,11].map(a => <option key={a} value={a}>{a} years old</option>)}
+                        {[4, 5, 6, 7, 8, 9, 10, 11].map(a => <option key={a} value={a}>{a} years old</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="text-sm font-bold text-slate-700 block mb-2">Grade</label>
-                      <select 
+                      <select
                         value={childData.grade}
-                        onChange={(e) => setChildData({...childData, grade: e.target.value as Grade})}
+                        onChange={(e) => setChildData({ ...childData, grade: e.target.value as Grade })}
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 font-bold"
                       >
                         {Object.values(Grade).map(g => <option key={g} value={g}>{g}</option>)}
@@ -127,7 +129,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                     </div>
                   </div>
                 </div>
-                <button 
+                <button
                   disabled={!childData.name}
                   onClick={nextStep}
                   className="w-full bg-[#6C63FF] disabled:opacity-50 text-white py-6 rounded-2xl font-bold text-xl shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3"
@@ -140,34 +142,23 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
             {step === 2 && (
               <div className="space-y-8">
                 <div className="text-center">
-                  <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">What Does {childData.name} Need Help With?</h2>
-                  <p className="text-slate-500 font-medium">Select areas for targeted practice.</p>
+                  <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Sparkles size={32} />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">Custom Struggles & Needs</h2>
+                  <p className="text-slate-500 font-medium leading-relaxed">Describe exactly what {childData.name} is struggling with (e.g., "carrying digits in addition" or "reading comprehension").</p>
                 </div>
-                
-                <div className="space-y-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {Object.entries(TOPICS_BY_SUBJECT).map(([sub, topics]) => (
-                    <div key={sub} className="space-y-4">
-                      <h4 className="font-bold text-lg text-indigo-600 flex items-center gap-2">
-                         {sub === Subject.Math && "📐"} {sub === Subject.Reading && "📖"} 
-                         {sub === Subject.Writing && "✍️"} {sub === Subject.Science && "🔬"} 
-                         {sub === Subject.History && "🕰️"} 
-                         {sub}
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {topics.map(topic => (
-                          <button
-                            key={topic}
-                            onClick={() => toggleNeed(sub as Subject, topic)}
-                            className={`p-4 rounded-2xl border-2 text-left transition-all text-sm font-bold ${childData.learningNeeds?.[sub as Subject]?.includes(topic) ? 'border-[#6C63FF] bg-indigo-50 text-indigo-700' : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-200'}`}
-                          >
-                            {topic}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+
+                <div className="space-y-4">
+                  <textarea
+                    value={childData.struggles}
+                    onChange={(e) => setChildData({ ...childData, struggles: e.target.value })}
+                    placeholder="Type here..."
+                    className="w-full h-40 bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 focus:ring-4 focus:ring-[#6C63FF]/10 text-lg transition-all outline-none resize-none font-medium"
+                  />
+                  <p className="text-xs text-slate-400 italic">Our AI will use this specific input to tailor every worksheet for {childData.name}.</p>
                 </div>
-                
+
                 <div className="flex gap-4">
                   <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl">Back</button>
                   <button onClick={nextStep} className="flex-[2] bg-[#6C63FF] text-white py-6 rounded-2xl font-bold text-xl">Continue</button>
@@ -181,7 +172,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">What's Included</h2>
                   <p className="text-slate-500 font-medium">Worksheets are available for these subjects. You can access them anytime.</p>
                 </div>
-                
+
                 <div className="grid gap-3">
                   <StaticCurriculumItem label="Math" icon={<BookOpen size={20} />} />
                   <StaticCurriculumItem label="Reading" icon={<FileText size={20} />} />
@@ -211,10 +202,10 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">Review & Confirm</h2>
                   <p className="text-slate-500 font-medium">Review your child's personalized setup.</p>
                 </div>
-                
-                <div className="space-y-4">
+
+                <div className="space-y-4 text-left">
                   <ReviewItem label="Child Profile" value={`${childData.name}, Age ${childData.age}, ${childData.grade}`} onEdit={() => setStep(1)} />
-                  <ReviewItem label="Learning Needs" value={Object.values(childData.learningNeeds || {}).flat().slice(0, 3).join(', ') + (Object.values(childData.learningNeeds || {}).flat().length > 3 ? '...' : '')} onEdit={() => setStep(2)} />
+                  <ReviewItem label="Target Struggles" value={childData.struggles || 'None specified'} onEdit={() => setStep(2)} />
                   <ReviewItem label="Plan" value={`Full Curriculum Access`} onEdit={() => setStep(3)} />
                 </div>
 
@@ -222,15 +213,21 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete, user }) 
                   <div className="bg-emerald-500 text-white p-2 rounded-xl">
                     <Shield size={20} />
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h4 className="font-bold text-emerald-900 text-sm">3 Day Free Trial Starts Now</h4>
                     <p className="text-xs text-emerald-700 leading-relaxed">Cancel anytime in settings.</p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl">Back</button>
-                  <button onClick={handleFinish} className="flex-[2] bg-[#FF7A59] text-white py-6 rounded-2xl font-bold text-xl shadow-xl shadow-orange-100">Start Learning!</button>
+                  <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl disabled:opacity-50" disabled={loading}>Back</button>
+                  <button
+                    onClick={handleFinish}
+                    disabled={loading}
+                    className="flex-[2] bg-[#FF7A59] text-white py-6 rounded-2xl font-bold text-xl shadow-xl shadow-orange-100 flex items-center justify-center gap-2 disabled:opacity-70"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={24} /> : 'Start Learning!'}
+                  </button>
                 </div>
               </div>
             )}
@@ -258,9 +255,9 @@ const StaticCurriculumItem = ({ label, icon }: { label: string, icon: React.Reac
 
 const ReviewItem = ({ label, value, onEdit }: { label: string, value: string, onEdit: () => void }) => (
   <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex justify-between items-center">
-    <div>
+    <div className="max-w-[80%]">
       <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</h4>
-      <p className="font-bold text-slate-800">{value}</p>
+      <p className="font-bold text-slate-800 line-clamp-2">{value}</p>
     </div>
     <button onClick={onEdit} className="text-[#6C63FF] font-bold text-xs uppercase tracking-widest hover:underline">Edit</button>
   </div>

@@ -61,9 +61,15 @@ export interface Worksheet {
   grade: Grade;
   date: string;
   title: string;
+  topic?: string;
   instructions: string;
   questions: Question[];
   status: 'pending' | 'ready' | 'completed';
+  created_at?: string;
+  content?: {
+    instructions: string;
+    questions: Question[];
+  };
 }
 
 export interface AppState {
