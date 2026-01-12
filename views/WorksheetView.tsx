@@ -12,6 +12,7 @@ export const WorksheetView: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [showAnswerKey, setShowAnswerKey] = useState(searchParams.get('key') === 'true');
   const [isExporting, setIsExporting] = useState(false);
@@ -38,14 +39,35 @@ export const WorksheetView: React.FC = () => {
         ...data,
         instructions: data.content?.instructions || '',
         questions: data.content?.questions || [],
+        answers: data.answers || {},
         date: new Date(data.created_at).toLocaleDateString()
       };
 
       setWorksheet(formattedWs);
+      setAnswers(data.answers || {});
     } catch (err) {
       console.error('Error fetching worksheet:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAnswerChange = async (questionId: string, value: string) => {
+    if (showAnswerKey) return;
+
+    const newAnswers = { ...answers, [questionId]: value };
+    setAnswers(newAnswers);
+
+    // Auto-save to Supabase
+    try {
+      const { error } = await supabase
+        .from('worksheets')
+        .update({ answers: newAnswers })
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Failed to auto-save answer:', err);
     }
   };
 
@@ -183,64 +205,100 @@ export const WorksheetView: React.FC = () => {
 
           {/* Problems List */}
           <div className="space-y-12 md:space-y-20 flex-grow h-auto">
-            {worksheet.questions.map((q, idx) => (
-              <div key={q.id || idx} className="relative group text-left">
-                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
-                  {/* Number Badge */}
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-[#1A1F3A] text-white rounded-xl md:rounded-2xl flex items-center justify-center font-extrabold text-lg md:text-xl shrink-0 shadow-lg mt-1">
-                    {idx + 1}
-                  </div>
+            {worksheet.questions.map((q, idx) => {
+              const currentAnswer = answers[q.id || `q-${idx}`] || '';
 
-                  <div className="flex-grow space-y-6 md:space-y-8 w-full">
-                    <h3 className="text-xl md:text-2xl font-extrabold text-[#1A1F3A] leading-tight pt-1 break-words">
-                      {q.text}
-                    </h3>
+              return (
+                <div key={q.id || idx} className="relative group text-left">
+                  <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
+                    {/* Number Badge */}
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-[#1A1F3A] text-white rounded-xl md:rounded-2xl flex items-center justify-center font-extrabold text-lg md:text-xl shrink-0 shadow-lg mt-1">
+                      {idx + 1}
+                    </div>
 
-                    {/* Subject Specific Inputs */}
-                    {q.type === 'multiple-choice' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
-                        {q.options?.map((opt, i) => (
-                          <div key={i} className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl transition-all ${showAnswerKey && opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
-                            <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
-                            <span className={`text-base md:text-lg font-bold ${showAnswerKey && opt === q.correctAnswer ? 'text-emerald-700' : 'text-slate-700'}`}>{opt}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex-grow space-y-6 md:space-y-8 w-full">
+                      <h3 className="text-xl md:text-2xl font-extrabold text-[#1A1F3A] leading-tight pt-1 break-words">
+                        {q.text}
+                      </h3>
 
-                    {q.type === 'text' && (
-                      <div className="w-full space-y-4">
-                        <div className="w-full min-h-[6rem] border-2 border-dashed border-slate-100 rounded-2xl md:rounded-[2rem] bg-slate-50/30 flex items-center justify-center p-4 md:p-8">
-                          {showAnswerKey ? (
-                            <span className="text-emerald-600 font-extrabold text-lg md:text-xl italic text-center">Correct Answer: {q.correctAnswer}</span>
-                          ) : (
-                            <div className="w-full h-full border-b-2 border-slate-100 relative top-2 md:top-4" />
+                      {/* Subject Specific Inputs */}
+                      {q.type === 'multiple-choice' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+                          {q.options?.map((opt, i) => (
+                            <button
+                              key={i}
+                              disabled={showAnswerKey}
+                              onClick={() => handleAnswerChange(q.id || `q-${idx}`, opt)}
+                              className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl transition-all text-left ${showAnswerKey
+                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'
+                                : currentAnswer === opt ? 'border-[#6C63FF] bg-indigo-50/30' : 'border-slate-100 hover:border-slate-200'
+                                }`}
+                            >
+                              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 transition-all ${showAnswerKey
+                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'
+                                : currentAnswer === opt ? 'border-[#6C63FF] bg-[#6C63FF]' : 'border-slate-100'
+                                }`} />
+                              <span className={`text-base md:text-lg font-bold ${showAnswerKey
+                                ? opt === q.correctAnswer ? 'text-emerald-700' : 'text-slate-400'
+                                : currentAnswer === opt ? 'text-[#6C63FF]' : 'text-slate-700'
+                                }`}>{opt}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {q.type === 'text' && (
+                        <div className="w-full space-y-4">
+                          <textarea
+                            disabled={showAnswerKey}
+                            value={showAnswerKey ? q.correctAnswer : currentAnswer}
+                            onChange={(e) => handleAnswerChange(q.id || `q-${idx}`, e.target.value)}
+                            placeholder="Type your answer here..."
+                            className={`w-full min-h-[8rem] p-6 md:p-8 border-2 border-dashed rounded-2xl md:rounded-[2rem] text-lg md:text-xl font-bold transition-all focus:outline-none focus:ring-4 focus:ring-indigo-100 resize-none ${showAnswerKey
+                              ? 'bg-emerald-50 border-emerald-200 text-emerald-700 italic'
+                              : 'bg-slate-50/30 border-slate-100 focus:border-[#6C63FF] text-[#1A1F3A]'
+                              }`}
+                          />
+                          {showAnswerKey && (
+                            <p className="text-emerald-600 font-extrabold text-xs uppercase tracking-widest pl-4">Correct Answer Above</p>
                           )}
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {q.type === 'true-false' && (
-                      <div className="flex flex-col sm:flex-row gap-4 md:gap-10">
-                        <div className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl min-w-[120px] md:min-w-[160px] justify-center ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
-                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
-                          <span className={`font-extrabold text-lg md:text-xl ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'true' ? 'text-emerald-700' : 'text-slate-700'}`}>TRUE</span>
+                      {q.type === 'true-false' && (
+                        <div className="flex flex-col sm:flex-row gap-4 md:gap-10">
+                          {['True', 'False'].map((val) => (
+                            <button
+                              key={val}
+                              disabled={showAnswerKey}
+                              onClick={() => handleAnswerChange(q.id || `q-${idx}`, val)}
+                              className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl min-w-[120px] md:min-w-[160px] justify-center transition-all ${showAnswerKey
+                                ? q.correctAnswer?.toLowerCase() === val.toLowerCase() ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100 opacity-50'
+                                : currentAnswer.toLowerCase() === val.toLowerCase() ? 'border-[#6C63FF] bg-indigo-50/30' : 'border-slate-100 hover:border-slate-200'
+                                }`}
+                            >
+                              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 transition-all ${showAnswerKey
+                                ? q.correctAnswer?.toLowerCase() === val.toLowerCase() ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'
+                                : currentAnswer.toLowerCase() === val.toLowerCase() ? 'border-[#6C63FF] bg-[#6C63FF]' : 'border-slate-100'
+                                }`} />
+                              <span className={`font-extrabold text-lg md:text-xl ${showAnswerKey
+                                ? q.correctAnswer?.toLowerCase() === val.toLowerCase() ? 'text-emerald-700' : 'text-slate-400'
+                                : currentAnswer.toLowerCase() === val.toLowerCase() ? 'text-[#6C63FF]' : 'text-slate-700'
+                                }`}>{val.toUpperCase()}</span>
+                            </button>
+                          ))}
                         </div>
-                        <div className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl min-w-[120px] md:min-w-[160px] justify-center ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'}`}>
-                          <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'}`} />
-                          <span className={`font-extrabold text-lg md:text-xl ${showAnswerKey && q.correctAnswer?.toLowerCase() === 'false' ? 'text-emerald-700' : 'text-slate-700'}`}>FALSE</span>
-                        </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Divider Decor */}
-                {idx < worksheet.questions.length - 1 && (
-                  <div className="mt-10 md:mt-16 h-px bg-slate-50 w-full" />
-                )}
-              </div>
-            ))}
+                  {/* Divider Decor */}
+                  {idx < worksheet.questions.length - 1 && (
+                    <div className="mt-10 md:mt-16 h-px bg-slate-50 w-full" />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Paper Footer */}

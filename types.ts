@@ -70,6 +70,7 @@ export interface Worksheet {
     instructions: string;
     questions: Question[];
   };
+  answers?: Record<string, string>;
 }
 
 export interface AppState {
