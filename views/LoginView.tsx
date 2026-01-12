@@ -16,15 +16,21 @@ export const LoginView: React.FC = () => {
     setError(null);
 
     try {
+      console.log('LoginView: Attempting login for:', email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('LoginView: Login error:', error);
+        throw error;
+      }
 
+      console.log('LoginView: Login successful');
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('LoginView: Catch block error:', err);
       setError(err.message || 'Failed to log in');
     } finally {
       setLoading(false);

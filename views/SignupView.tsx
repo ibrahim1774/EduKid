@@ -16,6 +16,7 @@ export const SignupView: React.FC = () => {
     setError(null);
 
     try {
+      console.log('SignupView: Attempting signup for:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -24,13 +25,15 @@ export const SignupView: React.FC = () => {
         },
       });
 
+      console.log('SignupView: Signup response data:', data);
       if (error) throw error;
 
-      if (data.user) {
-        // Since email confirmation is "disabled" in Supabase, we can often proceed
-        // However, Supabase still might return the user. 
-        // We'll redirect to onboarding.
+      if (data.session) {
+        console.log('SignupView: Session created immediately');
         navigate('/onboarding');
+      } else if (data.user) {
+        console.log('SignupView: User created but no session. Email confirmation likely required');
+        setError('Account created! Please check your email to confirm your account before logging in.');
       }
     } catch (err: any) {
       setError(err.message || 'Failed to sign up');

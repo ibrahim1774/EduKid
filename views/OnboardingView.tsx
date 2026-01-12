@@ -28,10 +28,16 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
   const prevStep = () => setStep(step - 1);
 
   const handleFinish = async () => {
-    if (!user) return;
+    console.log('OnboardingView: handleFinish called. User state:', user?.email || 'No user');
+    if (!user) {
+      alert('You must be logged in to save a profile. Please try logging in again.');
+      navigate('/login');
+      return;
+    }
     setLoading(true);
 
     try {
+      console.log('OnboardingView: Attempting to insert child data:', childData);
       const { data, error } = await supabase
         .from('children')
         .insert([
@@ -40,20 +46,24 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
             name: childData.name,
             age: childData.age,
             grade: childData.grade,
-            interests: [], // Can add interests step later if needed
+            interests: [],
             struggles: childData.struggles,
           }
         ])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('OnboardingView: Supabase insert error:', error);
+        throw error;
+      }
 
+      console.log('OnboardingView: Successfully saved child profile:', data);
       onComplete(data);
       navigate('/dashboard');
     } catch (err: any) {
-      console.error('Error saving child profile:', err);
-      alert('Failed to save profile. Please try again.');
+      console.error('OnboardingView: Catch block error:', err);
+      alert(`Failed to save profile: ${err.message || 'Unknown error'}. Please try again.`);
     } finally {
       setLoading(false);
     }
