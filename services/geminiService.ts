@@ -23,7 +23,7 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       contents: {
         parts: [{ text: prompts[promptId] || prompts[0] }],
       },
@@ -60,7 +60,7 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
   Return as valid JSON with title, instructions, and questions array.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.0-flash",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -129,7 +129,7 @@ export const getTutorExplanation = async (userQuestion: string, context: string,
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt,
     });
 
