@@ -104,9 +104,11 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
 
       setWorksheets(prev => [data, ...prev]);
       onViewWorksheet(data.id);
-    } catch (e) {
-      console.error(e);
-      alert("Failed to generate worksheet. Please try again.");
+    } catch (e: any) {
+      console.error('Worksheet generation sequence failed:', e);
+      // Log more details if it's a Supabase error
+      if (e.code) console.error('Supabase Error details:', e.message, e.details);
+      alert(`Failed to generate worksheet: ${e.message || "Unknown error"}. Please try again.`);
     } finally {
       setGenerating(null);
     }
