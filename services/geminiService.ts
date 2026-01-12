@@ -7,11 +7,22 @@ import { Grade, Subject, Worksheet, Question } from "../types";
  */
 export const generateAppImage = async (promptId: number): Promise<string> => {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
   if (!apiKey) {
-    console.warn("VITE_GEMINI_API_KEY not found in import.meta.env. Images may not load.");
+    console.error("CRITICAL: VITE_GEMINI_API_KEY is missing! Using high-quality educational fallbacks instead of AI generation.");
+    // Return high-quality educational fallbacks directly if key is missing
+    const fallbacks = [
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200", // Child learning
+      "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=800",  // School/Education
+      "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800",  // Math/Science
+      "https://images.unsplash.com/photo-1454165833767-027ffea9e77b?q=80&w=800",  // Study setup
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200", // Family learning
+      "https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=800"   // Books/Library
+    ];
+    return fallbacks[promptId] || fallbacks[0];
   }
 
-  const ai = new GoogleGenAI({ apiKey: apiKey || "" });
+  const ai = new GoogleGenAI({ apiKey });
   const prompts = [
     "Hyper-realistic 8k professional photograph of a young child with soft curly hair and a blue knit sweater, looking at a modern white tablet with an expression of pure joy and wonder. The room is filled with soft, warm afternoon sunlight. High-detail skin textures, authentic expression, cinematic depth of field, masterpiece quality.",
     "Close-up high-detail photograph of a parent's hands and a child's hands together, working on a clean, high-quality printed paper worksheet with colorful educational diagrams. Warm natural lighting, authentic textures of paper and pencil, grounded home setting, 8k resolution.",
@@ -41,10 +52,10 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
         }
       }
     }
-    return `https://picsum.photos/seed/edukid${promptId}/1200/800`;
+    return `https://source.unsplash.com/featured/?education,kid,learning&sig=${promptId}`;
   } catch (error) {
-    console.error("Image generation failed", error);
-    return `https://picsum.photos/seed/edukid${promptId}/1200/800`;
+    console.error("AI Image generation failed (check your API key restriction/billing):", error);
+    return `https://source.unsplash.com/featured/?education,kid,learning&sig=${promptId}`;
   }
 };
 
