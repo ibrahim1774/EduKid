@@ -225,13 +225,7 @@ export const HomeView: React.FC = () => {
           <motion.div {...fadeIn} className="order-2 lg:order-1 relative">
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] scale-105 -rotate-2"></div>
             <div className="relative z-10 aspect-video rounded-[2rem] overflow-hidden shadow-xl bg-slate-100 flex items-center justify-center">
-              <motion.img
-                initial={{ opacity: 0.5 }}
-                animate={{ opacity: 1 }}
-                src={APP_IMAGES.lesson}
-                alt="Structured Lesson Plans"
-                className="w-full h-full object-cover"
-              />
+              <WistiaEmbed mediaId="ggwj6mbnze" />
             </div>
           </motion.div>
           <motion.div {...fadeIn} className="order-1 lg:order-2">
