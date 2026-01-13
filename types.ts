@@ -43,6 +43,7 @@ export interface Child {
   subjects: Subject[];
   learningNeeds: LearningNeeds;
   preferences: ParentPreferences;
+  preferredTopics?: Record<string, string[]>;
 }
 
 export interface Question {
@@ -71,6 +72,7 @@ export interface Worksheet {
     questions: Question[];
   };
   answers?: Record<string, string>;
+  learningContent?: string;
 }
 
 export interface AppState {

@@ -62,13 +62,27 @@ export const generateAppImage = async (promptId: number): Promise<string> => {
 /**
  * Generates a full worksheet based on child's grade and subject.
  */
-export const generateWorksheetAction = async (childName: string, grade: Grade, subject: Subject, struggles?: string): Promise<Partial<Worksheet>> => {
+export const generateWorksheetAction = async (
+  childName: string,
+  grade: Grade,
+  subject: Subject,
+  struggles?: string,
+  topic?: string
+): Promise<Partial<Worksheet>> => {
   const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
+
   const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
-  ${struggles ? `CRITICAL: The student is specifically struggling with: "${struggles}". Please include several targeted problems and clear examples addressing this struggle.` : 'Focus on grade-appropriate challenges.'}
-  Include 10-15 varied problems.
-  Return as valid JSON with title, instructions, and questions array.`;
+  ${topic ? `TOPIC: "${topic}".` : ''}
+  ${struggles ? `CRITICAL: The student is specifically struggling with: "${struggles}".` : ''}
+
+  STRUCTURE:
+  1. LEARNING SECTION: Briefly and clearly teach the child the concept for today's topic (${topic || 'the lesson'}). 
+     - Write in a kid-friendly, concise, and structured way for ${grade} level.
+     - Explain: What the topic is, key ideas or rules, and simple examples.
+  2. PRACTICE SECTION: 10-15 varied problems directly related to the learning section.
+
+  Return as valid JSON with title, topic, learningContent (the explanation text), instructions, and questions array.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
@@ -79,6 +93,8 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
         type: Type.OBJECT,
         properties: {
           title: { type: Type.STRING },
+          topic: { type: Type.STRING },
+          learningContent: { type: Type.STRING },
           instructions: { type: Type.STRING },
           questions: {
             type: Type.ARRAY,
@@ -94,7 +110,7 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
             }
           }
         },
-        required: ['title', 'instructions', 'questions']
+        required: ['title', 'learningContent', 'instructions', 'questions']
       }
     }
   });
@@ -104,10 +120,12 @@ export const generateWorksheetAction = async (childName: string, grade: Grade, s
     const data = JSON.parse(text || '{}');
     return {
       title: data.title,
+      topic: data.topic || topic || "General Practice",
+      learningContent: data.learningContent,
       instructions: data.instructions,
       questions: (data.questions || []).map((q: any, idx: number) => ({
         ...q,
-        id: `q-${idx}`
+        id: `q-${idx}-${Math.random().toString(36).substr(2, 5)}`
       })),
       subject,
       grade

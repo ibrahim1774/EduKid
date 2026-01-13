@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Subject, Child, Worksheet } from '../types';
-import { Plus, Sparkles, FileText, ChevronRight, User, Loader2, BookOpen, Clock, Key, Calendar } from 'lucide-react';
+import { Subject, Grade, Worksheet } from '../types';
+import { Plus, Sparkles, FileText, ChevronRight, User, Loader2, BookOpen, Clock, Key, Calendar, Target, BrainCircuit, GraduationCap } from 'lucide-react';
 import { generateWorksheetAction } from '../services/geminiService';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LearningCalendar } from '../components/LearningCalendar';
 import { isSameDay, format, startOfToday } from 'date-fns';
+import { COMMON_TOPICS } from '../lib/topics';
 
 interface DashboardProps {
   onViewWorksheet: (id: string, showAnswerKey?: boolean) => void;
@@ -24,6 +25,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   const [activeSubject, setActiveSubject] = useState<Subject>(Subject.Math);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
+  const [manualTopic, setManualTopic] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -73,15 +75,20 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
 
   const activeChild = children.find(c => c.id === activeChildId);
 
-  const handleGenerate = async (subject: Subject) => {
+  const handleGenerate = async (subject: Subject, selectedTopic?: string) => {
     if (!activeChild) return;
     setGenerating(subject);
     try {
+      const topicToUse = selectedTopic || manualTopic || (activeChild.preferred_topics?.[subject]?.length > 0
+        ? activeChild.preferred_topics[subject][Math.floor(Math.random() * activeChild.preferred_topics[subject].length)]
+        : undefined);
+
       const result = await generateWorksheetAction(
         activeChild.name,
         activeChild.grade,
         subject,
-        activeChild.struggles
+        activeChild.struggles,
+        topicToUse
       );
 
       const { data, error } = await supabase
@@ -89,12 +96,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
         .insert([
           {
             child_id: activeChild.id,
-            title: result.title || "Today's Lesson",
-            topic: result.topic || "General Practice",
+            title: result.title || `${topicToUse || "Today's"} Lesson`,
+            topic: result.topic || topicToUse || "General Practice",
             subject: subject,
+            learning_content: result.learningContent,
             content: {
               instructions: result.instructions,
-              questions: (result.questions || []).map((q: any) => ({ ...q, id: Math.random().toString(36).substr(2, 9) }))
+              questions: (result.questions || []).map((q: any) => ({ ...q, id: q.id || Math.random().toString(36).substr(2, 9) }))
             }
           }
         ])
@@ -104,11 +112,10 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
       if (error) throw error;
 
       setWorksheets(prev => [data, ...prev]);
-      onViewWorksheet(data.id);
+      setManualTopic(null);
     } catch (e: any) {
-      console.error('Worksheet generation sequence failed:', e);
-      if (e.code) console.error('Supabase Error details:', e.message, e.details);
-      alert(`Failed to generate worksheet: ${e.message || "Unknown error"}. Please try again.`);
+      console.error('Worksheet generation failed:', e);
+      alert(`Failed to generate: ${e.message || "Unknown error"}`);
     } finally {
       setGenerating(null);
     }
@@ -138,28 +145,26 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   }
 
   const isTodaySelected = isSameDay(selectedDate, startOfToday());
-
   const currentWorksheets = worksheets.filter(w =>
-    w.subject === activeSubject && isSameDay(new Date(w.created_at), selectedDate)
+    w.subject === activeSubject && isSameDay(new Date(w.created_at || ''), selectedDate)
   );
 
   const worksheetDates = worksheets.map(w => w.created_at);
-  const subjects = [Subject.Math, Subject.Reading, Subject.Writing, Subject.Science, Subject.History];
+  const subjects = [Subject.Math, Subject.Reading, Subject.Writing, Subject.Science];
+  const popularTopics = COMMON_TOPICS[activeSubject] || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-16 bg-[#F7F9FC] font-sans">
+    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 bg-[#F7F9FC] font-sans text-left">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10 md:mb-16">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A]">
-              {isTodaySelected ? "Welcome back! 🌟" : format(selectedDate, 'MMM do, yyyy')}
-            </h1>
-          </div>
-          <p className="text-slate-500 font-medium text-base md:text-lg">
+          <h1 className="text-3xl font-extrabold text-[#1A1F3A] mb-2 flex items-center gap-3">
+            {isTodaySelected ? "Main Dashboard 🏠" : format(selectedDate, 'MMMM do, yyyy')}
+          </h1>
+          <p className="text-slate-500 font-medium text-lg text-left">
             {isTodaySelected
-              ? `Here's ${activeChild?.name}'s personalized learning dashboard.`
-              : `Reviewing ${activeChild?.name}'s past work from ${format(selectedDate, 'MMMM do')}.`
+              ? `Let's see what ${activeChild?.name} is learning today.`
+              : `Reviewing ${activeChild?.name}'s past accomplishments.`
             }
           </p>
         </div>
@@ -186,10 +191,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
           {subjects.map(sub => (
             <button
               key={sub}
-              onClick={() => setActiveSubject(sub)}
+              onClick={() => { setActiveSubject(sub); setManualTopic(null); }}
               className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-all border-2 flex items-center gap-2 ${activeSubject === sub ? 'bg-[#1A1F3A] text-white border-[#1A1F3A] shadow-md' : 'bg-white text-slate-500 border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}
             >
               {sub === Subject.Math && <BookOpen size={18} />}
+              {sub === Subject.Reading && <FileText size={18} />}
+              {sub === Subject.Writing && <Plus size={18} />}
+              {sub === Subject.Science && <Sparkles size={18} />}
               {sub}
             </button>
           ))}
@@ -198,82 +206,117 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
         {!isTodaySelected && (
           <button
             onClick={() => setSelectedDate(startOfToday())}
-            className="text-xs font-bold text-[#6C63FF] bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-all"
+            className="text-xs font-bold text-[#6C63FF] bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-all font-sans uppercase tracking-[1px]"
           >
             Back to Today
           </button>
         )}
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-10">
+      <div className="grid lg:grid-cols-12 gap-8 text-left">
         {/* Main Column */}
-        <div className="lg:col-span-8 space-y-12">
-          {/* Active Subject Today Section */}
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-extrabold text-[#1A1F3A]">
-                {isTodaySelected ? "Today's" : format(selectedDate, 'MMM do')} {activeSubject}
-              </h2>
-            </div>
-
-            {currentWorksheets.length > 0 ? (
-              <div className="space-y-4">
-                {currentWorksheets.map(ws => (
-                  <div key={ws.id} className="bg-white p-6 md:p-8 rounded-[2.5rem] border-2 border-[#6C63FF] shadow-2xl shadow-indigo-100/40 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex items-center gap-6 w-full">
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-indigo-50 text-[#6C63FF] rounded-3xl flex items-center justify-center shrink-0">
-                        <FileText size={40} />
-                      </div>
-                      <div className="text-left">
-                        <h4 className="text-2xl font-extrabold text-[#1A1F3A] mb-1 leading-tight">{ws.title}</h4>
-                        <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-widest">
-                          <span className="bg-slate-50 px-2 py-1 rounded-md">{activeSubject}</span>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                          <span>{isTodaySelected ? 'Ready for Practice' : 'Completed Journal'}</span>
-                        </div>
-                      </div>
+        <div className="lg:col-span-8 space-y-8 text-left">
+          {currentWorksheets.length > 0 ? (
+            <div className="space-y-8 text-left">
+              {currentWorksheets.map(ws => (
+                <div key={ws.id} className="space-y-8 text-left">
+                  {/* Learning Section */}
+                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden text-left">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 flex items-center justify-center">
+                      <BrainCircuit size={40} className="text-amber-300 mt-12 mr-12" />
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-center gap-3 w-full md:w-auto">
-                      <button onClick={() => onViewWorksheet(ws.id)} className="flex-1 md:flex-none px-8 py-4 bg-[#6C63FF] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all active:scale-95">
-                        {isTodaySelected ? 'Start Practice' : 'Review Work'}
-                      </button>
-                      <button onClick={() => onViewWorksheet(ws.id, true)} className="flex-1 md:flex-none px-8 py-4 bg-amber-50 text-amber-700 border border-amber-200 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-amber-100 transition-all active:scale-95">
-                        <Key size={20} /> Key
-                      </button>
+                    <div className="relative z-10 text-left">
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">Part 1: The Lesson</div>
+                        <h2 className="text-2xl font-black text-[#1A1F3A] leading-none">{ws.topic || ws.title}</h2>
+                      </div>
+                      <div className="prose prose-slate max-w-none text-left">
+                        <p className="text-lg text-slate-600 leading-relaxed font-medium whitespace-pre-wrap text-left">
+                          {ws.learning_content || "Wait while we prepare the lesson content..."}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white p-10 md:p-16 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center text-center">
-                <div className="w-24 h-24 bg-slate-50 text-slate-300 rounded-[2rem] flex items-center justify-center mb-8">
-                  {isTodaySelected ? <Plus size={48} /> : <Calendar size={48} />}
+
+                  {/* Practice Section */}
+                  <div className="bg-[#6C63FF] p-8 md:p-10 rounded-[2.5rem] text-white shadow-2xl shadow-indigo-200/40 flex flex-col md:flex-row justify-between items-center gap-8 text-left">
+                    <div className="flex items-center gap-6 w-full text-left">
+                      <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center shrink-0">
+                        <Target size={40} />
+                      </div>
+                      <div className="text-left">
+                        <div className="bg-white/20 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 inline-block">Part 2: Daily Practice</div>
+                        <h4 className="text-2xl font-black mb-1 leading-tight text-left">Ready to test your skills?</h4>
+                        <p className="text-white/80 font-bold text-left">{ws.content?.questions?.length || 0} Questions related to {ws.topic}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                      <button onClick={() => onViewWorksheet(ws.id)} className="flex-1 md:flex-none px-10 py-5 bg-white text-[#6C63FF] rounded-2xl font-black text-lg shadow-xl hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap">
+                        {isTodaySelected ? 'Go to Practice ✨' : 'Review Work'}
+                      </button>
+                      {isTodaySelected && (
+                        <button onClick={() => onViewWorksheet(ws.id, true)} className="flex-1 md:flex-none px-6 py-5 bg-[#1A1F3A] text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95">
+                          <Key size={20} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <h4 className="text-2xl font-extrabold text-[#1A1F3A] mb-3 tracking-tight">
-                  {isTodaySelected ? `Generate ${activeSubject} Worksheet` : `No Practice for this Date`}
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-8 text-left">
+              {/* Generation Control */}
+              <div className="bg-white p-10 md:p-16 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center text-center">
+                <div className="w-24 h-24 bg-indigo-50 text-[#6C63FF] rounded-[2.5rem] flex items-center justify-center mb-8">
+                  {isTodaySelected ? <GraduationCap size={48} /> : <Calendar size={48} />}
+                </div>
+                <h4 className="text-2xl font-black text-[#1A1F3A] mb-3 tracking-tight">
+                  {manualTopic ? `Focus: ${manualTopic}` : `Start ${activeSubject} Lesson`}
                 </h4>
-                <p className="text-slate-400 text-lg font-medium mb-10 max-w-sm">
+                <p className="text-slate-400 text-lg font-medium mb-10 max-w-sm text-center">
                   {isTodaySelected
-                    ? `A new personalized worksheet for ${activeChild?.name} is ready. Start today's lesson with one click.`
-                    : `No ${activeSubject} worksheets were generated on this date. Choose a date with a green dot on the calendar to see past work.`
+                    ? `Create today's lesson and practice. Pick a topic below or let the AI choose based on previous focus.`
+                    : `No ${activeSubject} worksheets were generated on this date.`
                   }
                 </p>
                 {isTodaySelected && (
                   <button
                     disabled={generating !== null}
                     onClick={() => handleGenerate(activeSubject)}
-                    className="w-full max-w-md bg-[#6C63FF] text-white py-5 rounded-2xl font-bold text-xl flex items-center justify-center gap-3 transition-all hover:shadow-2xl shadow-indigo-100 active:scale-95 disabled:opacity-70"
+                    className="w-full max-w-md bg-[#6C63FF] text-white py-6 rounded-2xl font-black text-xl flex items-center justify-center gap-3 transition-all hover:shadow-2xl shadow-indigo-100 active:scale-95 disabled:opacity-70"
                   >
-                    {generating === activeSubject ? <Loader2 size={28} className="animate-spin" /> : <><Sparkles size={24} /> Create Daily Worksheet</>}
+                    {generating === activeSubject ? <Loader2 size={28} className="animate-spin" /> : <><Sparkles size={24} /> Create Daily Lesson</>}
                   </button>
                 )}
               </div>
-            )}
-          </div>
+
+              {/* Popular Topics Section */}
+              {isTodaySelected && (
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 text-left">
+                  <h3 className="text-xs font-black text-[#1A1F3A] mb-6 flex items-center gap-2 uppercase tracking-widest text-left">
+                    <Target className="text-[#6C63FF]" size={18} /> Common Topics Reference
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-4 text-left">
+                    {popularTopics.map(topic => (
+                      <button
+                        key={topic}
+                        onClick={() => setManualTopic(topic)}
+                        className={`p-5 rounded-2xl border-2 transition-all flex items-center justify-between text-left group ${manualTopic === topic ? 'bg-indigo-50 border-[#6C63FF] text-[#6C63FF]' : 'bg-white border-slate-50 hover:border-slate-100 text-slate-600'}`}
+                      >
+                        <span className="font-bold">{topic}</span>
+                        <ChevronRight size={18} className={manualTopic === topic ? 'text-[#6C63FF]' : 'text-slate-300 group-hover:text-slate-400'} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-4 space-y-10">
+        <div className="lg:col-span-4 space-y-8 text-left">
           <LearningCalendar
             currentDate={selectedDate}
             onDateSelect={setSelectedDate}
@@ -282,12 +325,12 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
 
           <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-indigo-50 relative overflow-hidden text-left">
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-12 -mt-12 opacity-50" />
-            <div className="relative z-10">
-              <h3 className="font-extrabold text-[#1A1F3A] mb-4 flex items-center gap-2">
-                <Sparkles className="text-amber-500" size={20} /> Learning Summary
+            <div className="relative z-10 text-left text-left">
+              <h3 className="font-black text-[#1A1F3A] mb-4 flex items-center gap-2 uppercase tracking-widest text-xs text-left">
+                <Sparkles className="text-amber-500" size={20} /> Parent Tip
               </h3>
-              <p className="text-slate-600 leading-relaxed font-medium text-sm">
-                Each dot on the calendar represents a day of growth. Review past work to see progress in {activeSubject}.
+              <p className="text-slate-600 leading-relaxed font-bold text-sm text-left">
+                Each lesson starts with Part 1: Learning, followed by Part 2: Practice. This structure helps {activeChild?.name} master concepts systematically.
               </p>
             </div>
           </div>

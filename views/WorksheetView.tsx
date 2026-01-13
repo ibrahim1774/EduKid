@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Worksheet } from '../types';
-import { ArrowLeft, Printer, Download, Sparkles, FileText, CheckCircle, Star, Key, Loader2 } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Sparkles, FileText, CheckCircle, Star, Key, Loader2, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -40,7 +40,8 @@ export const WorksheetView: React.FC = () => {
         instructions: data.content?.instructions || '',
         questions: data.content?.questions || [],
         answers: data.answers || {},
-        date: new Date(data.created_at).toLocaleDateString()
+        date: new Date(data.created_at).toLocaleDateString(),
+        learningContent: data.learning_content
       };
 
       setWorksheet(formattedWs);
@@ -124,7 +125,7 @@ export const WorksheetView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] py-4 md:py-16 px-2 md:px-4 font-sans">
+    <div className="min-h-screen bg-[#F0F2F5] py-4 md:py-16 px-2 md:px-4 font-sans text-left">
       {/* Navigation & Actions */}
       <div className="max-w-[21cm] mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 no-print">
         <button onClick={() => navigate('/dashboard')} className="flex items-center gap-3 text-slate-500 hover:text-[#6C63FF] font-extrabold transition-colors w-full md:w-auto p-2">
@@ -160,19 +161,19 @@ export const WorksheetView: React.FC = () => {
           ref={worksheetRef}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="max-w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl p-8 md:p-24 rounded-2xl md:rounded-[3rem] border border-slate-100 relative print:shadow-none print:border-none print:p-0 print:rounded-none print:max-w-none overflow-x-hidden flex flex-col h-auto text-left"
+          className="max-w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl p-8 md:p-16 rounded-2xl md:rounded-[3rem] border border-slate-100 relative print:shadow-none print:border-none print:p-8 print:rounded-none print:max-w-none overflow-x-hidden flex flex-col h-auto text-left"
         >
           {/* Branding Decor */}
           <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-[#6C63FF] via-[#A599FF] to-[#5DCEA0] rounded-t-2xl md:rounded-t-[3rem] no-print"></div>
 
           {/* Paper Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-10 md:mb-16 border-b-2 border-slate-50 pb-8 md:pb-12 shrink-0">
-            <div className="w-full md:w-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-8 mb-10 md:mb-12 border-b-2 border-slate-50 pb-8 md:pb-12 shrink-0 text-left">
+            <div className="w-full md:w-auto text-left">
               <div className="flex items-center gap-2 md:gap-3 text-[#6C63FF] font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 md:mb-3">
-                <FileText size={16} /> Daily {worksheet.subject} Practice
+                <FileText size={16} /> Daily {worksheet.subject} Lesson & Practice
               </div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#1A1F3A] leading-tight mb-2 uppercase tracking-tighter break-words">
-                {worksheet.title} {showAnswerKey && <span className="text-amber-500">(ANSWER KEY)</span>}
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#1A1F3A] leading-tight mb-2 uppercase tracking-tighter break-words text-left">
+                {worksheet.title} {showAnswerKey && <span className="text-amber-500">(KEY)</span>}
               </h1>
               <div className="flex items-center flex-wrap gap-2 md:gap-4 text-slate-400 font-bold text-xs md:text-sm">
                 <span className="bg-slate-50 px-2 md:px-3 py-1 rounded-lg">{worksheet.grade}</span>
@@ -183,22 +184,36 @@ export const WorksheetView: React.FC = () => {
               </div>
             </div>
             <div className="text-right hidden md:block">
-              <div className="w-16 md:w-20 h-16 md:h-20 border-2 border-dashed border-slate-100 rounded-2xl md:rounded-3xl flex items-center justify-center mb-2">
+              <div className="w-16 md:w-20 h-16 md:h-20 border-2 border-dashed border-slate-100 rounded-2xl md:rounded-3xl flex items-center justify-center mb-2 ml-auto">
                 <div className="w-8 md:w-10 h-8 md:h-10 bg-[#6C63FF] rounded-xl" />
               </div>
-              <p className="text-[10px] text-slate-300 font-extrabold uppercase tracking-widest">EduKid Learning Platform</p>
+              <p className="text-[10px] text-slate-300 font-extrabold uppercase tracking-widest text-right">EduKid Learning Platform</p>
             </div>
           </div>
 
-          {/* Instructions Box */}
-          <div className="mb-10 md:mb-16 bg-indigo-50/40 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-indigo-100/50 relative overflow-hidden shrink-0 text-left">
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Sparkles size={80} />
+          {/* Learning Section (New) */}
+          {worksheet.learningContent && (
+            <div className="mb-8 md:mb-12 bg-amber-50/30 p-8 md:p-12 rounded-2xl md:rounded-[3rem] border border-amber-100/50 relative overflow-hidden shrink-0 text-left">
+              <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                <Star size={100} fill="currentColor" className="text-amber-400" />
+              </div>
+              <p className="text-[10px] md:text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <BrainCircuit size={16} /> Part 1: Today's Lesson
+              </p>
+              <div className="prose prose-slate max-w-none text-left">
+                <p className="text-lg md:text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap text-left">
+                  {worksheet.learningContent}
+                </p>
+              </div>
             </div>
-            <p className="text-[10px] md:text-sm font-extrabold text-[#6C63FF] uppercase tracking-widest mb-2 md:mb-3 flex items-center gap-2">
-              <Sparkles size={14} /> Instructions
+          )}
+
+          {/* Instructions Box */}
+          <div className="mb-10 md:mb-16 bg-indigo-50/40 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-indigo-100/50 relative overflow-hidden shrink-0 text-left">
+            <p className="text-[10px] md:text-xs font-black text-[#6C63FF] uppercase tracking-[0.2em] mb-2 flex items-center gap-2 text-left">
+              <Sparkles size={14} /> Part 2: Practice Instructions
             </p>
-            <p className="text-base md:text-xl text-indigo-900 leading-relaxed font-medium italic">
+            <p className="text-base md:text-lg text-indigo-900 leading-relaxed font-bold italic text-left">
               "{worksheet.instructions}"
             </p>
           </div>
