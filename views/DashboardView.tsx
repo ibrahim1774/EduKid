@@ -133,7 +133,25 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   };
 
   const isStructured = (content: any): content is StructuredLesson => {
-    return content && typeof content === 'object' && 'overview' in content;
+    const structured = getStructuredContent(content);
+    return structured !== null && typeof structured === 'object' && 'overview' in structured;
+  };
+
+  const getStructuredContent = (content: any): StructuredLesson | any => {
+    if (!content) return null;
+    if (typeof content === 'object' && 'overview' in content) return content;
+    if (typeof content === 'string') {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed && typeof parsed === 'object' && ('overview' in parsed || 'learningContent' in parsed)) {
+          // Handle nested learningContent if that's how it's stored
+          return parsed.learningContent || parsed;
+        }
+      } catch (e) {
+        // Fail silently
+      }
+    }
+    return content;
   };
 
   if (loading) {
@@ -247,10 +265,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
                       </div>
                       <div className="prose prose-slate max-w-none text-left">
                         <p className="text-xl text-slate-600 leading-relaxed font-medium whitespace-pre-wrap text-left">
-                          {isStructured(ws.learning_content)
-                            ? truncateText(ws.learning_content.overview)
-                            : (ws.learning_content ? truncateText(ws.learning_content) : "Wait while we prepare the lesson content...")
-                          }
+                          {(() => {
+                            const content = getStructuredContent(ws.learning_content);
+                            if (content && typeof content === 'object' && 'overview' in content) {
+                              return truncateText(content.overview);
+                            }
+                            return content ? truncateText(content as string) : "Wait while we prepare the lesson content...";
+                          })()}
                         </p>
                         <div className="mt-4 flex flex-col gap-6">
                           <p className="text-4xl font-extrabold text-slate-200 tracking-[0.2em] leading-none">...</p>
@@ -406,37 +427,52 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
                   active={activeTab === 'overview'}
                   onClick={() => setActiveTab('overview')}
                   icon={<Info size={18} />}
-                  label="Overview"
+                  label="1. Overview"
                   color="indigo"
                 />
                 <TabButton
                   active={activeTab === 'importance'}
                   onClick={() => setActiveTab('importance')}
                   icon={<Star size={18} />}
-                  label="Why It Matters"
+                  label="2. Why It Matters"
                   color="amber"
                 />
                 <TabButton
                   active={activeTab === 'breakdown'}
                   onClick={() => setActiveTab('breakdown')}
                   icon={<ListChecks size={18} />}
-                  label="Lesson Plan"
+                  label="3. Lesson Plan"
                   color="emerald"
                 />
                 <TabButton
                   active={activeTab === 'example'}
                   onClick={() => setActiveTab('example')}
                   icon={<Target size={18} />}
-                  label="Example Walkthrough"
+                  label="4. Example"
                   color="pink"
                 />
                 <TabButton
                   active={activeTab === 'expectations'}
                   onClick={() => setActiveTab('expectations')}
                   icon={<CheckCircle2 size={18} />}
-                  label="What's Next"
+                  label="5. Finish"
                   color="sky"
                 />
+              </div>
+
+              {/* Progress Bar */}
+              <div className="px-8 md:px-12 mb-4 shrink-0">
+                <div className="h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                  <motion.div
+                    className={`h-full transition-all duration-500 ${activeTab === 'overview' ? 'bg-indigo-500 w-1/5' :
+                      activeTab === 'importance' ? 'bg-amber-400 w-2/5' :
+                        activeTab === 'breakdown' ? 'bg-emerald-400 w-3/5' :
+                          activeTab === 'example' ? 'bg-pink-400 w-4/5' :
+                            'bg-sky-400 w-full'
+                      }`}
+                    initial={false}
+                  />
+                </div>
               </div>
 
               {/* Modal Content Area */}
@@ -444,38 +480,57 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                     className="prose prose-slate max-w-none text-left"
                   >
-                    {!isStructured(fullLessonWs.learning_content) ? (
-                      <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100">
-                        <p className="text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
-                          {fullLessonWs.learning_content || "Lesson content is loading..."}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="mb-4">
-                          <h3 className={`text-2xl font-black mb-4 ${activeTab === 'overview' ? 'text-indigo-600' :
-                            activeTab === 'importance' ? 'text-amber-600' :
-                              activeTab === 'breakdown' ? 'text-emerald-600' :
-                                activeTab === 'example' ? 'text-pink-600' :
-                                  'text-sky-600'
-                            }`}>
-                            {activeTab === 'overview' && "What You'll Learn Today"}
-                            {activeTab === 'importance' && "Why This Skill Is Important"}
-                            {activeTab === 'breakdown' && "Step-by-Step Lesson Plan"}
-                            {activeTab === 'example' && "Let's Look at an Example"}
-                            {activeTab === 'expectations' && "Practice Questions Ahead"}
-                          </h3>
+                    {(() => {
+                      const content = getStructuredContent(fullLessonWs.learning_content);
+                      if (!content || (typeof content === 'string')) {
+                        return (
+                          <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center text-center min-h-[300px]">
+                            <p className="text-2xl text-slate-500 leading-relaxed font-bold italic">
+                              {content || "Preparing the perfect lesson for you..."}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className={`p-10 md:p-14 rounded-[3rem] border-4 transition-all duration-700 ${activeTab === 'overview' ? 'bg-indigo-50/50 border-indigo-100' :
+                          activeTab === 'importance' ? 'bg-amber-50/50 border-amber-100' :
+                            activeTab === 'breakdown' ? 'bg-emerald-50/50 border-emerald-100' :
+                              activeTab === 'example' ? 'bg-pink-50/50 border-pink-100' :
+                                'bg-sky-50/50 border-sky-100'
+                          }`}>
+                          <div className="mb-8">
+                            <h3 className={`text-4xl font-black mb-4 tracking-tight ${activeTab === 'overview' ? 'text-indigo-600' :
+                              activeTab === 'importance' ? 'text-amber-600' :
+                                activeTab === 'breakdown' ? 'text-emerald-600' :
+                                  activeTab === 'example' ? 'text-pink-600' :
+                                    'text-sky-600'
+                              }`}>
+                              {activeTab === 'overview' && "🗺️ What You'll Learn Today"}
+                              {activeTab === 'importance' && "💎 Why This Skill Is Important"}
+                              {activeTab === 'breakdown' && "📝 Step-by-Step Lesson Plan"}
+                              {activeTab === 'example' && "🎨 Let's Look at an Example"}
+                              {activeTab === 'expectations' && "🚀 Ready for the Challenge?"}
+                            </h3>
+                            <div className={`h-1.5 w-24 rounded-full ${activeTab === 'overview' ? 'bg-indigo-600' :
+                              activeTab === 'importance' ? 'bg-amber-600' :
+                                activeTab === 'breakdown' ? 'bg-emerald-600' :
+                                  activeTab === 'example' ? 'bg-pink-600' :
+                                    'bg-sky-600'
+                              }`} />
+                          </div>
+                          <p className="text-2xl text-slate-700 leading-loose font-medium whitespace-pre-wrap">
+                            {content[activeTab]}
+                          </p>
                         </div>
-                        <p className="text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
-                          {fullLessonWs.learning_content[activeTab]}
-                        </p>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </motion.div>
                 </AnimatePresence>
               </div>
