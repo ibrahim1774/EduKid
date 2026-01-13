@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Worksheet } from '../types';
-import { ArrowLeft, Printer, Download, Sparkles, FileText, CheckCircle, Star, Key, Loader2, BrainCircuit } from 'lucide-react';
+import { Worksheet, StructuredLesson } from '../types';
+import { ArrowLeft, Printer, Download, Sparkles, FileText, CheckCircle, Star, Key, Loader2, BrainCircuit, Info, ListChecks, Target, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -16,6 +16,8 @@ export const WorksheetView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAnswerKey, setShowAnswerKey] = useState(searchParams.get('key') === 'true');
   const [isExporting, setIsExporting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   const worksheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,8 +55,12 @@ export const WorksheetView: React.FC = () => {
     }
   };
 
+  const isStructured = (content: any): content is StructuredLesson => {
+    return content && typeof content === 'object' && 'overview' in content;
+  };
+
   const handleAnswerChange = async (questionId: string, value: string) => {
-    if (showAnswerKey) return;
+    if (showAnswerKey || hasSubmitted) return;
 
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
@@ -70,6 +76,21 @@ export const WorksheetView: React.FC = () => {
     } catch (err) {
       console.error('Failed to auto-save answer:', err);
     }
+  };
+
+  const handleSubmit = () => {
+    if (!worksheet) return;
+
+    let correct = 0;
+    worksheet.questions.forEach(q => {
+      const userAnswer = (answers[q.id] || '').trim().toLowerCase();
+      const correctAnswer = (q.correctAnswer || '').trim().toLowerCase();
+      if (userAnswer === correctAnswer) correct++;
+    });
+
+    setScore({ correct, total: worksheet.questions.length });
+    setHasSubmitted(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const downloadPDF = async () => {
@@ -191,27 +212,38 @@ export const WorksheetView: React.FC = () => {
             </div>
           </div>
 
-          {/* Learning Section (New) */}
-          {worksheet.learningContent && (
-            <div className="mb-8 md:mb-12 bg-amber-50/30 p-8 md:p-12 rounded-2xl md:rounded-[3rem] border border-amber-100/50 relative overflow-hidden shrink-0 text-left">
-              <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-                <Star size={100} fill="currentColor" className="text-amber-400" />
+          {/* Results Summary */}
+          {hasSubmitted && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-12 bg-emerald-50 border-4 border-emerald-100 rounded-[3rem] p-10 text-center"
+            >
+              <div className="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-100">
+                <CheckCircle2 size={40} />
               </div>
-              <p className="text-[10px] md:text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                <BrainCircuit size={16} /> Part 1: Today's Lesson
-              </p>
-              <div className="prose prose-slate max-w-none text-left">
-                <p className="text-lg md:text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap text-left">
-                  {worksheet.learningContent}
-                </p>
+              <h2 className="text-4xl font-black text-emerald-900 mb-2">Great Job, {worksheet.childName || 'Little Hero'}!</h2>
+              <p className="text-xl text-emerald-700 font-bold mb-6">You finished your practice today!</p>
+
+              <div className="flex justify-center gap-8">
+                <div className="bg-white px-8 py-6 rounded-3xl shadow-sm border border-emerald-50">
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Score</span>
+                  <span className="text-4xl font-black text-emerald-600">{score.correct} / {score.total}</span>
+                </div>
+                <div className="bg-white px-8 py-6 rounded-3xl shadow-sm border border-emerald-50">
+                  <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Status</span>
+                  <span className="text-4xl font-black text-emerald-600">
+                    {Math.round((score.correct / score.total) * 100)}%
+                  </span>
+                </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {/* Instructions Box */}
+          {/* Instructions Box (Updated wording) */}
           <div className="mb-10 md:mb-16 bg-indigo-50/40 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-indigo-100/50 relative overflow-hidden shrink-0 text-left">
             <p className="text-[10px] md:text-xs font-black text-[#6C63FF] uppercase tracking-[0.2em] mb-2 flex items-center gap-2 text-left">
-              <Sparkles size={14} /> Part 2: Practice Instructions
+              <Sparkles size={14} /> Practice Instructions
             </p>
             <p className="text-base md:text-lg text-indigo-900 leading-relaxed font-bold italic text-left">
               "{worksheet.instructions}"
@@ -244,13 +276,13 @@ export const WorksheetView: React.FC = () => {
                               key={i}
                               disabled={showAnswerKey}
                               onClick={() => handleAnswerChange(q.id || `q-${idx}`, opt)}
-                              className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl transition-all text-left ${showAnswerKey
-                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100'
+                              className={`flex items-center gap-4 p-4 md:p-6 border-2 rounded-2xl md:rounded-3xl transition-all text-left ${showAnswerKey || hasSubmitted
+                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-50' : currentAnswer === opt ? 'border-red-200 bg-red-50/50' : 'border-slate-100'
                                 : currentAnswer === opt ? 'border-[#6C63FF] bg-indigo-50/30' : 'border-slate-100 hover:border-slate-200'
                                 }`}
                             >
-                              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 transition-all ${showAnswerKey
-                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-500' : 'border-slate-100'
+                              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-4 shrink-0 transition-all ${showAnswerKey || hasSubmitted
+                                ? opt === q.correctAnswer ? 'border-emerald-500 bg-emerald-500' : currentAnswer === opt ? 'border-red-400 bg-red-400' : 'border-slate-100'
                                 : currentAnswer === opt ? 'border-[#6C63FF] bg-[#6C63FF]' : 'border-slate-100'
                                 }`} />
                               <span className={`text-base md:text-lg font-bold ${showAnswerKey
@@ -307,6 +339,14 @@ export const WorksheetView: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Explanation for Parent/Child */}
+                  {(showAnswerKey || hasSubmitted) && q.explanation && (
+                    <div className="mt-6 ml-14 md:ml-20 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Teacher's Note:</p>
+                      <p className="text-slate-600 font-medium leading-relaxed">{q.explanation}</p>
+                    </div>
+                  )}
+
                   {/* Divider Decor */}
                   {idx < worksheet.questions.length - 1 && (
                     <div className="mt-10 md:mt-16 h-px bg-slate-50 w-full" />
@@ -314,6 +354,25 @@ export const WorksheetView: React.FC = () => {
                 </div>
               );
             })}
+
+            {/* Submit Button Section */}
+            {!hasSubmitted && !showAnswerKey && (
+              <div className="mt-20 pt-16 border-t-2 border-slate-50 text-center">
+                <div className="max-w-md mx-auto space-y-6">
+                  <div className="w-16 h-16 bg-indigo-50 text-[#6C63FF] rounded-[1.5rem] flex items-center justify-center mx-auto">
+                    <CheckCircle size={32} />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#1A1F3A]">All done with practice?</h3>
+                  <p className="text-slate-400 font-bold">Great work! Click below to see how you did.</p>
+                  <button
+                    onClick={handleSubmit}
+                    className="w-full bg-[#6C63FF] text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-indigo-100 hover:-translate-y-1 transition-all active:scale-95"
+                  >
+                    Submit Answers ✨
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Paper Footer */}

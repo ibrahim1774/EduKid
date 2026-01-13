@@ -51,8 +51,17 @@ export interface Question {
   text: string;
   options?: string[];
   correctAnswer?: string;
+  explanation?: string;
   type: 'multiple-choice' | 'text' | 'true-false';
   focusArea?: string;
+}
+
+export interface StructuredLesson {
+  overview: string;
+  importance: string;
+  breakdown: string;
+  example: string;
+  expectations: string;
 }
 
 export interface Worksheet {
@@ -72,7 +81,7 @@ export interface Worksheet {
     questions: Question[];
   };
   answers?: Record<string, string>;
-  learningContent?: string;
+  learningContent?: string | StructuredLesson;
 }
 
 export interface AppState {

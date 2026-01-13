@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Subject, Grade, Worksheet } from '../types';
-import { Plus, Sparkles, FileText, ChevronRight, User, Loader2, BookOpen, Clock, Key, Calendar, Target, BrainCircuit, GraduationCap } from 'lucide-react';
+import { Subject, Grade, Worksheet, StructuredLesson } from '../types';
+import { Plus, Sparkles, FileText, ChevronRight, User, Loader2, BookOpen, Clock, Key, Calendar, Target, BrainCircuit, GraduationCap, X, Star, ListChecks, CheckCircle2, Info } from 'lucide-react';
 import { generateWorksheetAction } from '../services/geminiService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -26,6 +26,10 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
   const [manualTopic, setManualTopic] = useState<string | null>(null);
+
+  // Full Lesson State
+  const [fullLessonWs, setFullLessonWs] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<keyof StructuredLesson>('overview');
 
   useEffect(() => {
     if (user) {
@@ -121,6 +125,17 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
     }
   };
 
+  const truncateText = (text: string) => {
+    // Split by sentence endings and take the first 2
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    const preview = sentences.slice(0, 2).join(' ');
+    return preview.length > 0 ? preview.trim() : text.substring(0, 150).trim();
+  };
+
+  const isStructured = (content: any): content is StructuredLesson => {
+    return content && typeof content === 'object' && 'overview' in content;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -137,7 +152,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
         </motion.div>
         <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Ready to Start Learning?</h2>
         <p className="text-slate-500 mb-10 max-w-sm text-lg font-medium">Add your child's profile to begin generating personalized practice worksheets every day.</p>
-        <button onClick={onAddChild} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-indigo-100 flex items-center gap-3 hover:-translate-y-1 transition-all">
+        <button onAddChild={onAddChild} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-indigo-100 flex items-center gap-3 hover:-translate-y-1 transition-all">
           <Plus size={24} /> Add Child Profile
         </button>
       </div>
@@ -220,20 +235,32 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
             <div className="space-y-8 text-left">
               {currentWorksheets.map(ws => (
                 <div key={ws.id} className="space-y-8 text-left">
-                  {/* Learning Section */}
-                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden text-left">
+                  {/* Learning Section Preview */}
+                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden text-left min-h-[300px] flex flex-col">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 flex items-center justify-center">
                       <BrainCircuit size={40} className="text-amber-300 mt-12 mr-12" />
                     </div>
-                    <div className="relative z-10 text-left">
+                    <div className="relative z-10 text-left flex-grow">
                       <div className="flex items-center gap-2 mb-6">
                         <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">Part 1: The Lesson</div>
                         <h2 className="text-2xl font-black text-[#1A1F3A] leading-none">{ws.topic || ws.title}</h2>
                       </div>
-                      <div className="prose prose-slate max-w-none text-left max-h-[700px] overflow-y-auto pr-6 custom-scrollbar">
-                        <p className="text-lg text-slate-600 leading-relaxed font-medium whitespace-pre-wrap text-left">
-                          {ws.learning_content || "Wait while we prepare the lesson content..."}
+                      <div className="prose prose-slate max-w-none text-left">
+                        <p className="text-xl text-slate-600 leading-relaxed font-medium whitespace-pre-wrap text-left">
+                          {isStructured(ws.learning_content)
+                            ? truncateText(ws.learning_content.overview)
+                            : (ws.learning_content ? truncateText(ws.learning_content) : "Wait while we prepare the lesson content...")
+                          }
                         </p>
+                        <div className="mt-4 flex flex-col gap-6">
+                          <p className="text-4xl font-extrabold text-slate-200 tracking-[0.2em] leading-none">...</p>
+                          <button
+                            onClick={() => { setFullLessonWs(ws); setActiveTab('overview'); }}
+                            className="w-full sm:w-auto bg-[#FF7A59] hover:bg-[#FF8B6D] text-white px-10 py-5 rounded-[2rem] font-black text-xl transition-all shadow-xl shadow-orange-100 flex items-center justify-center gap-3 group active:scale-95"
+                          >
+                            Continue Lesson <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -325,7 +352,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
 
           <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-indigo-50 relative overflow-hidden text-left">
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full -mr-12 -mt-12 opacity-50" />
-            <div className="relative z-10 text-left text-left">
+            <div className="relative z-10 text-left">
               <h3 className="font-black text-[#1A1F3A] mb-4 flex items-center gap-2 uppercase tracking-widest text-xs text-left">
                 <Sparkles className="text-amber-500" size={20} /> Parent Tip
               </h3>
@@ -336,6 +363,164 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
           </div>
         </div>
       </div>
+
+      {/* Full Lesson Modal */}
+      <AnimatePresence>
+        {fullLessonWs && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setFullLessonWs(null)}
+              className="absolute inset-0 bg-[#1A1F3A]/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative bg-white w-full max-w-5xl h-[90vh] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col"
+            >
+              {/* Modal Header */}
+              <div className="p-8 md:p-12 pb-6 flex justify-between items-start shrink-0">
+                <div>
+                  <div className="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest inline-block mb-3">Part 1: The Full Lesson</div>
+                  <h2 className="text-3xl md:text-4xl font-black text-[#1A1F3A] leading-tight">
+                    {fullLessonWs.topic || fullLessonWs.title}
+                  </h2>
+                  <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-xs">
+                    Building Strong Foundations • {fullLessonWs.grade}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setFullLessonWs(null)}
+                  className="bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 p-4 rounded-2xl transition-all"
+                >
+                  <X size={28} />
+                </button>
+              </div>
+
+              {/* Modal Tabs Navigation */}
+              <div className="px-8 md:px-12 mb-6 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
+                <TabButton
+                  active={activeTab === 'overview'}
+                  onClick={() => setActiveTab('overview')}
+                  icon={<Info size={18} />}
+                  label="Overview"
+                  color="indigo"
+                />
+                <TabButton
+                  active={activeTab === 'importance'}
+                  onClick={() => setActiveTab('importance')}
+                  icon={<Star size={18} />}
+                  label="Why It Matters"
+                  color="amber"
+                />
+                <TabButton
+                  active={activeTab === 'breakdown'}
+                  onClick={() => setActiveTab('breakdown')}
+                  icon={<ListChecks size={18} />}
+                  label="Lesson Plan"
+                  color="emerald"
+                />
+                <TabButton
+                  active={activeTab === 'example'}
+                  onClick={() => setActiveTab('example')}
+                  icon={<Target size={18} />}
+                  label="Example Walkthrough"
+                  color="pink"
+                />
+                <TabButton
+                  active={activeTab === 'expectations'}
+                  onClick={() => setActiveTab('expectations')}
+                  icon={<CheckCircle2 size={18} />}
+                  label="What's Next"
+                  color="sky"
+                />
+              </div>
+
+              {/* Modal Content Area */}
+              <div className="flex-grow overflow-y-auto px-8 md:px-12 pb-12 custom-scrollbar">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="prose prose-slate max-w-none text-left"
+                  >
+                    {!isStructured(fullLessonWs.learning_content) ? (
+                      <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                        <p className="text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
+                          {fullLessonWs.learning_content || "Lesson content is loading..."}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="mb-4">
+                          <h3 className={`text-2xl font-black mb-4 ${activeTab === 'overview' ? 'text-indigo-600' :
+                            activeTab === 'importance' ? 'text-amber-600' :
+                              activeTab === 'breakdown' ? 'text-emerald-600' :
+                                activeTab === 'example' ? 'text-pink-600' :
+                                  'text-sky-600'
+                            }`}>
+                            {activeTab === 'overview' && "What You'll Learn Today"}
+                            {activeTab === 'importance' && "Why This Skill Is Important"}
+                            {activeTab === 'breakdown' && "Step-by-Step Lesson Plan"}
+                            {activeTab === 'example' && "Let's Look at an Example"}
+                            {activeTab === 'expectations' && "Practice Questions Ahead"}
+                          </h3>
+                        </div>
+                        <p className="text-xl text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
+                          {fullLessonWs.learning_content[activeTab]}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-8 md:p-12 pt-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/50 shrink-0">
+                <p className="text-slate-400 font-bold text-sm">Mistakes are part of learning! Take your time.</p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setFullLessonWs(null)}
+                    className="px-8 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all"
+                  >
+                    Close Lesson
+                  </button>
+                  <button
+                    onClick={() => { setFullLessonWs(null); onViewWorksheet(fullLessonWs.id); }}
+                    className="px-8 py-4 bg-[#6C63FF] text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-[#5A52E0] transition-all"
+                  >
+                    Start Practice questions
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+};
+
+const TabButton = ({ active, onClick, icon, label, color }: { active: boolean, onClick: () => void, icon: any, label: string, color: string }) => {
+  const colors: any = {
+    indigo: active ? 'bg-indigo-600 text-white shadow-indigo-100' : 'bg-slate-50 text-slate-400 hover:bg-indigo-50',
+    amber: active ? 'bg-amber-500 text-white shadow-amber-100' : 'bg-slate-50 text-slate-400 hover:bg-amber-50',
+    emerald: active ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-50 text-slate-400 hover:bg-emerald-50',
+    pink: active ? 'bg-pink-500 text-white shadow-pink-100' : 'bg-slate-50 text-slate-400 hover:bg-pink-50',
+    sky: active ? 'bg-sky-500 text-white shadow-sky-100' : 'bg-slate-50 text-slate-400 hover:bg-sky-50',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-6 py-4 rounded-2xl font-black text-sm whitespace-nowrap transition-all flex items-center gap-3 active:scale-95 shadow-lg ${colors[color]}`}
+    >
+      {icon} {label}
+    </button>
   );
 };

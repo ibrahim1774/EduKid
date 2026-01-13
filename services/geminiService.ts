@@ -78,18 +78,18 @@ export const generateWorksheetAction = async (
 
   STRUCTURE:
   1. LEARNING SECTION: Provide a DEEP, THOROUGH, and DETAILED lesson teaching the child the concept for today's topic (${topic || 'the lesson'}). 
-     - TARGET LENGTH: Approximately 1000 words. 
+     - TARGET LENGTH: Approximately 1000 words total across all sections.
      - Write in a kid-friendly, engaging, and highly structured way for ${grade} level.
-     - Content MUST include: 
-       - An engaging introduction to grab their interest.
-       - Clear, step-by-step detailed explanations of core rules, definitions, and concepts.
-       - Multiple fun analogies, stories, or real-world connections to help understand complex parts.
-       - At least 5 detailed worked-out examples with step-by-step logic explained.
-       - A summary "Cheat Sheet" or "Remember These!" section at the end.
-     - Format: Use multiple paragraphs, clear headings, and bullet points to ensure the ~1000 words are easy to scan and read.
+     - Content MUST be broken into these 5 specific fields:
+       a) overview: "What You'll Learn Today" - Engaging intro, what we are doing, and simple goals.
+       b) importance: "Why This Matters" - How this skill helps them, real-world connections, and building confidence.
+       c) breakdown: "Step-by-Step Lesson Plan" - Clear instructions, rules, and definitions.
+       d) example: "Let's Look at an Example" - A detailed worked-out example with logic.
+       e) expectations: "What to Expect in Practice" - Encouragement and what the practice questions will be like.
+     - CRITICAL: DO NOT use raw markdown formatting like asterisks (**), hashtags (#), or bolding markers in the body text fields. Use plain text with clear paragraph breaks. The UI will handle headers and styling.
   2. PRACTICE SECTION: 10-15 varied problems directly related to the learning section.
 
-  Return as valid JSON with title, topic, learningContent (the full 1000-word explanation text), instructions, and questions array.`;
+  Return as valid JSON with title, topic, learningContent (the structured object), instructions, and questions array.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
@@ -101,7 +101,17 @@ export const generateWorksheetAction = async (
         properties: {
           title: { type: Type.STRING },
           topic: { type: Type.STRING },
-          learningContent: { type: Type.STRING },
+          learningContent: {
+            type: Type.OBJECT,
+            properties: {
+              overview: { type: Type.STRING },
+              importance: { type: Type.STRING },
+              breakdown: { type: Type.STRING },
+              example: { type: Type.STRING },
+              expectations: { type: Type.STRING }
+            },
+            required: ['overview', 'importance', 'breakdown', 'example', 'expectations']
+          },
           instructions: { type: Type.STRING },
           questions: {
             type: Type.ARRAY,
@@ -111,9 +121,10 @@ export const generateWorksheetAction = async (
                 text: { type: Type.STRING },
                 type: { type: Type.STRING, enum: ['multiple-choice', 'text', 'true-false'] },
                 options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                correctAnswer: { type: Type.STRING }
+                correctAnswer: { type: Type.STRING },
+                explanation: { type: Type.STRING, description: "A gentle explanation for a parent to help the child understand why this is the correct answer." }
               },
-              required: ['text', 'type']
+              required: ['text', 'type', 'correctAnswer', 'explanation']
             }
           }
         },

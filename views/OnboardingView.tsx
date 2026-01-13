@@ -17,7 +17,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 2;
 
   const [childData, setChildData] = useState({
     name: '',
@@ -165,33 +165,6 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 2 && (
               <div className="space-y-8">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Sparkles size={32} />
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">Custom Struggles & Needs</h2>
-                  <p className="text-slate-500 font-medium leading-relaxed">Describe exactly what {childData.name} is struggling with (e.g., "carrying digits in addition").</p>
-                </div>
-
-                <div className="space-y-4">
-                  <textarea
-                    value={childData.struggles}
-                    onChange={(e) => setChildData({ ...childData, struggles: e.target.value })}
-                    placeholder="Type here..."
-                    className="w-full h-40 bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 focus:ring-4 focus:ring-[#6C63FF]/10 text-lg transition-all outline-none resize-none font-medium"
-                  />
-                  <p className="text-xs text-slate-400 italic">Our AI will use this to tailor every lesson for {childData.name}.</p>
-                </div>
-
-                <div className="flex gap-4">
-                  <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl">Back</button>
-                  <button onClick={nextStep} className="flex-[2] bg-[#6C63FF] text-white py-6 rounded-2xl font-bold text-xl">Continue</button>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-8">
-                <div className="text-center">
                   <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Target size={32} />
                   </div>
@@ -229,65 +202,6 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
 
                 <div className="flex gap-4 pt-4 border-t border-slate-50">
                   <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl">Back</button>
-                  <button onClick={nextStep} className="flex-[2] bg-[#6C63FF] text-white py-6 rounded-2xl font-bold text-xl">Continue</button>
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-8">
-                <div className="text-center">
-                  <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">What's Included</h2>
-                  <p className="text-slate-500 font-medium">Personalized Learning & Practice for these subjects.</p>
-                </div>
-
-                <div className="grid gap-3">
-                  <StaticCurriculumItem label="Math" icon={<BookOpen size={20} />} />
-                  <StaticCurriculumItem label="Reading" icon={<FileText size={20} />} />
-                  <StaticCurriculumItem label="Writing" icon={<FileText size={20} />} />
-                  <StaticCurriculumItem label="Science" icon={<Sparkles size={20} />} />
-                </div>
-
-                <div className="bg-indigo-50 p-6 md:p-8 rounded-3xl border border-indigo-100 flex justify-between items-center mt-6">
-                  <div>
-                    <h4 className="font-bold text-indigo-900 text-sm uppercase tracking-widest mb-1">Plan Overview</h4>
-                    <p className="text-xs text-indigo-600 font-medium italic">Everything included for personalized growth</p>
-                  </div>
-                  <div className="text-2xl font-extrabold text-[#6C63FF]">$10/mo</div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl">Back</button>
-                  <button onClick={nextStep} className="flex-[2] bg-[#6C63FF] text-white py-6 rounded-2xl font-bold text-xl">Continue</button>
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="space-y-8">
-                <div className="text-center">
-                  <h2 className="text-2xl md:text-3xl font-extrabold text-[#1A1F3A] mb-3">Review & Confirm</h2>
-                  <p className="text-slate-500 font-medium">Review your child's personalized setup.</p>
-                </div>
-
-                <div className="space-y-4 text-left">
-                  <ReviewItem label="Child Profile" value={`${childData.name}, Age ${childData.age}, ${childData.grade}`} onEdit={() => setStep(1)} />
-                  <ReviewItem label="Target Struggles" value={childData.struggles || 'None specified'} onEdit={() => setStep(2)} />
-                  <ReviewItem label="Selected Topics" value={Object.values(childData.preferredTopics).flat().slice(0, 5).join(', ') + (Object.values(childData.preferredTopics).flat().length > 5 ? '...' : '') || 'None selected'} onEdit={() => setStep(3)} />
-                </div>
-
-                <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 flex items-start gap-4">
-                  <div className="bg-emerald-500 text-white p-2 rounded-xl">
-                    <Shield size={20} />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-bold text-emerald-900 text-sm">3 Day Free Trial Starts Now</h4>
-                    <p className="text-xs text-emerald-700 leading-relaxed">Cancel anytime in settings.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button onClick={prevStep} className="flex-1 bg-slate-100 text-slate-500 py-6 rounded-2xl font-bold text-xl disabled:opacity-50" disabled={loading}>Back</button>
                   <button
                     onClick={handleFinish}
                     disabled={loading}
