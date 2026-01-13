@@ -203,6 +203,87 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
+      {/* NEW SECTION 2: Designed for Daily, Custom Practice */}
+      <section className="py-16 bg-slate-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div {...fadeIn} className="order-2 lg:order-1">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-6 leading-tight">Designed for Daily, Custom Practice</h2>
+            <p className="text-lg text-slate-600 mb-6 leading-relaxed font-medium">
+              Every child's learning journey is different. EduKid.ai allows parents to generate fresh worksheets each day, tailored specifically to each child's unique learning profile based on their grade level, selected subjects, and parent-chosen focus areas.
+            </p>
+            <div className="space-y-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h4 className="font-extrabold text-[#1A1F3A] mb-2 flex items-center gap-2">
+                  <Zap size={18} className="text-amber-500" /> Flexible Generation
+                </h4>
+                <p className="text-slate-500 text-sm font-medium">Parents can generate new worksheets whenever they need them, ensuring practice fits easily into daily routines.</p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h4 className="font-extrabold text-[#1A1F3A] mb-2 flex items-center gap-2">
+                  <Target size={18} className="text-[#6C63FF]" /> Tailored Specifically
+                </h4>
+                <p className="text-slate-500 text-sm font-medium">Each child receives worksheets created specifically for their level, keeping daily practice consistent and effective.</p>
+              </div>
+            </div>
+          </motion.div>
+          <motion.div {...fadeIn} className="order-1 lg:order-2 relative">
+            <div className="absolute inset-0 bg-[#5A52E0]/5 rounded-[2rem] rotate-2 scale-105"></div>
+            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg bg-slate-50">
+              <WistiaEmbed mediaId="ro3mwosmus" aspect="1.33333333" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* NEW SECTION 3: How Parents Generate Daily Worksheets */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <motion.div {...fadeIn} className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#1A1F3A] mb-4">How Parents Generate Daily Worksheets</h2>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">Parents can generate new educational material each day in just a few seconds using their child's saved profile.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
+              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">1</div>
+              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Profile Match</h4>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">Generation takes into account your child's exact grade and saved profile data.</p>
+            </div>
+            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
+              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">2</div>
+              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Topic Selection</h4>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">Worksheets focus on the specific subjects (Math, Reading, etc.) and focus areas you've chosen.</p>
+            </div>
+            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
+              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">3</div>
+              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Daily Variation</h4>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">The system introduces variety within your settings so practice stays engaging without feeling repetitive.</p>
+            </div>
+            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
+              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">4</div>
+              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Parent Control</h4>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">Worksheets are created only when you choose to generate them, putting you in full control.</p>
+            </div>
+          </div>
+
+          <div className="mt-16 relative">
+            <div className="absolute inset-0 bg-indigo-50 rounded-[2.5rem] blur-xl opacity-50"></div>
+            <div className="relative z-10 bg-[#1A1F3A] rounded-[2.5rem] p-8 md:p-12 overflow-hidden">
+              <div className="grid lg:grid-cols-2 gap-10 items-center">
+                <div className="text-white">
+                  <h3 className="text-2xl md:text-3xl font-extrabold mb-4">Complete Flexibility</h3>
+                  <p className="text-indigo-100 text-lg mb-6 font-medium">Each subject can have its own daily worksheet, and parents can update subjects or focus areas at any time as the child progresses.</p>
+                  <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start Now <ArrowRight size={20} /></button>
+                </div>
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#1d2342]">
+                  <WistiaEmbed mediaId="aepfpq0du0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section 3: Features Grid */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
@@ -359,86 +440,6 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* NEW SECTION 2: Designed for Daily, Custom Practice */}
-      <section className="py-16 bg-slate-50 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div {...fadeIn} className="order-2 lg:order-1">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-6 leading-tight">Designed for Daily, Custom Practice</h2>
-            <p className="text-lg text-slate-600 mb-6 leading-relaxed font-medium">
-              Every child's learning journey is different. EduKid.ai allows parents to generate fresh worksheets each day, tailored specifically to each child's unique learning profile based on their grade level, selected subjects, and parent-chosen focus areas.
-            </p>
-            <div className="space-y-6">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h4 className="font-extrabold text-[#1A1F3A] mb-2 flex items-center gap-2">
-                  <Zap size={18} className="text-amber-500" /> Flexible Generation
-                </h4>
-                <p className="text-slate-500 text-sm font-medium">Parents can generate new worksheets whenever they need them, ensuring practice fits easily into daily routines.</p>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h4 className="font-extrabold text-[#1A1F3A] mb-2 flex items-center gap-2">
-                  <Target size={18} className="text-[#6C63FF]" /> Tailored Specifically
-                </h4>
-                <p className="text-slate-500 text-sm font-medium">Each child receives worksheets created specifically for their level, keeping daily practice consistent and effective.</p>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div {...fadeIn} className="order-1 lg:order-2 relative">
-            <div className="absolute inset-0 bg-[#5A52E0]/5 rounded-[2rem] rotate-2 scale-105"></div>
-            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg bg-slate-50">
-              <WistiaEmbed mediaId="ro3mwosmus" aspect="1.33333333" />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* NEW SECTION 3: How Parents Generate Daily Worksheets */}
-      <section className="py-20 bg-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <motion.div {...fadeIn} className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-[#1A1F3A] mb-4">How Parents Generate Daily Worksheets</h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">Parents can generate new educational material each day in just a few seconds using their child's saved profile.</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
-              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">1</div>
-              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Profile Match</h4>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium">Generation takes into account your child's exact grade and saved profile data.</p>
-            </div>
-            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
-              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">2</div>
-              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Topic Selection</h4>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium">Worksheets focus on the specific subjects (Math, Reading, etc.) and focus areas you've chosen.</p>
-            </div>
-            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
-              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">3</div>
-              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Daily Variation</h4>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium">The system introduces variety within your settings so practice stays engaging without feeling repetitive.</p>
-            </div>
-            <div className="bg-[#F8FAFC] p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:translate-y-[-4px]">
-              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-[#6C63FF] font-extrabold text-xl">4</div>
-              <h4 className="text-xl font-extrabold text-[#1A1F3A] mb-3">Parent Control</h4>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium">Worksheets are created only when you choose to generate them, putting you in full control.</p>
-            </div>
-          </div>
-
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-indigo-50 rounded-[2.5rem] blur-xl opacity-50"></div>
-            <div className="relative z-10 bg-[#1A1F3A] rounded-[2.5rem] p-8 md:p-12 overflow-hidden">
-              <div className="grid lg:grid-cols-2 gap-10 items-center">
-                <div className="text-white">
-                  <h3 className="text-2xl md:text-3xl font-extrabold mb-4">Complete Flexibility</h3>
-                  <p className="text-indigo-100 text-lg mb-6 font-medium">Each subject can have its own daily worksheet, and parents can update subjects or focus areas at any time as the child progresses.</p>
-                  <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start Now <ArrowRight size={20} /></button>
-                </div>
-                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#1d2342]">
-                  <WistiaEmbed mediaId="aepfpq0du0" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Section 6: Pricing Section */}
       <section className="py-16 bg-[#1A1F3A] text-white relative overflow-hidden">
