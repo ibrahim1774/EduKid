@@ -10,7 +10,8 @@ const APP_IMAGES = {
   worksheet: "/assets/images/worksheet-view.png",
   dashboard: "/assets/images/dashboard-lesson.png",
   lesson: "/assets/images/lesson-modal.png",
-  full: "/assets/images/dashboard-full.png"
+  full: "/assets/images/dashboard-full.png",
+  features_worksheet: "/assets/images/features-worksheet.png"
 };
 
 // Wistia Video Component
@@ -120,6 +121,62 @@ export const HomeView: React.FC = () => {
                 <Play size={12} className="fill-current" />
                 WATCH PRODUCT DEMO
               </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* NEW SECTION: Custom Daily Generated Worksheets */}
+      <section className="py-20 bg-white relative overflow-hidden text-left border-y border-slate-50">
+        <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div {...fadeIn} className="relative z-10 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[10px] uppercase tracking-widest mb-6">
+              <Zap size={14} className="fill-current" /> Personalized Practice
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-[#1A1F3A] mb-6 leading-[1.1] tracking-tight text-left">
+              Create Custom Daily Generated Worksheets
+            </h2>
+            <p className="text-xl text-slate-500 mb-8 leading-relaxed font-medium text-left">
+              Based on current issues your child is facing for each subject. Our AI identifies gaps and builds the perfect practice path.
+            </p>
+
+            <div className="space-y-5 mb-10">
+              <div className="flex gap-4 items-start">
+                <div className="mt-1 w-6 h-6 bg-indigo-50 text-[#6C63FF] rounded-lg flex items-center justify-center shrink-0">
+                  <Check size={14} strokeWidth={3} />
+                </div>
+                <p className="text-slate-600 font-bold text-lg">Target specific struggles in Math, Reading, & Science</p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="mt-1 w-6 h-6 bg-indigo-50 text-[#6C63FF] rounded-lg flex items-center justify-center shrink-0">
+                  <Check size={14} strokeWidth={3} />
+                </div>
+                <p className="text-slate-600 font-bold text-lg">Adjust difficulty levels as your child improves</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/get-started')}
+              className="bg-[#1A1F3A] hover:bg-black text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center gap-3"
+            >
+              Start Custom Path <ArrowRight size={22} />
+            </button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-indigo-100/50 rounded-[3rem] blur-3xl -z-10 rotate-6 translate-x-10 translate-y-10"></div>
+            <div className="relative z-10 rounded-[2.5rem] bg-white p-3 shadow-2xl border border-slate-100 shadow-indigo-100/50 transform hover:scale-[1.02] transition-transform duration-500">
+              <img
+                src={APP_IMAGES.features_worksheet}
+                alt="Custom Worksheet Generator"
+                className="w-full h-auto rounded-[2rem] shadow-sm"
+              />
             </div>
           </motion.div>
         </div>
