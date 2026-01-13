@@ -230,7 +230,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
                         <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest leading-none">Part 1: The Lesson</div>
                         <h2 className="text-2xl font-black text-[#1A1F3A] leading-none">{ws.topic || ws.title}</h2>
                       </div>
-                      <div className="prose prose-slate max-w-none text-left">
+                      <div className="prose prose-slate max-w-none text-left max-h-[700px] overflow-y-auto pr-6 custom-scrollbar">
                         <p className="text-lg text-slate-600 leading-relaxed font-medium whitespace-pre-wrap text-left">
                           {ws.learning_content || "Wait while we prepare the lesson content..."}
                         </p>

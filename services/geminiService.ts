@@ -71,18 +71,25 @@ export const generateWorksheetAction = async (
 ): Promise<Partial<Worksheet>> => {
   const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
 
-  const prompt = `Generate a high-quality, fun daily worksheet for ${childName}, a ${grade} student.
+  const prompt = `Generate a high-quality, comprehensive and fun daily lesson and worksheet for ${childName}, a ${grade} student.
   Subject: ${subject}. 
   ${topic ? `TOPIC: "${topic}".` : ''}
   ${struggles ? `CRITICAL: The student is specifically struggling with: "${struggles}".` : ''}
 
   STRUCTURE:
-  1. LEARNING SECTION: Briefly and clearly teach the child the concept for today's topic (${topic || 'the lesson'}). 
-     - Write in a kid-friendly, concise, and structured way for ${grade} level.
-     - Explain: What the topic is, key ideas or rules, and simple examples.
+  1. LEARNING SECTION: Provide a DEEP, THOROUGH, and DETAILED lesson teaching the child the concept for today's topic (${topic || 'the lesson'}). 
+     - TARGET LENGTH: Approximately 1000 words. 
+     - Write in a kid-friendly, engaging, and highly structured way for ${grade} level.
+     - Content MUST include: 
+       - An engaging introduction to grab their interest.
+       - Clear, step-by-step detailed explanations of core rules, definitions, and concepts.
+       - Multiple fun analogies, stories, or real-world connections to help understand complex parts.
+       - At least 5 detailed worked-out examples with step-by-step logic explained.
+       - A summary "Cheat Sheet" or "Remember These!" section at the end.
+     - Format: Use multiple paragraphs, clear headings, and bullet points to ensure the ~1000 words are easy to scan and read.
   2. PRACTICE SECTION: 10-15 varied problems directly related to the learning section.
 
-  Return as valid JSON with title, topic, learningContent (the explanation text), instructions, and questions array.`;
+  Return as valid JSON with title, topic, learningContent (the full 1000-word explanation text), instructions, and questions array.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
