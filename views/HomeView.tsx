@@ -128,41 +128,69 @@ export const HomeView: React.FC = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <FeatureCard img={images[1]} icon="📅" title="Fresh Practice" desc="Daily worksheets matched perfectly to grade and focus." />
-            <FeatureCard img={images[2]} icon="💡" title="Helpful Hints" desc="Built-in guidance to help your child understand the 'why'." />
+            <FeatureCard img={images[5]} icon="🎯" title="Topic Mastery" desc="Structured subtopics ensure your child masters one concept at a time." />
             <FeatureCard img={images[3]} icon="🖨️" title="Printable PDFs" desc="High-quality layouts designed for offline practice." />
             <FeatureCard img={images[5]} icon="🎓" title="Custom Plans" desc="Target struggles specifically with every daily sheet." />
           </div>
         </div>
       </section>
 
-      {/* Section 4: Learning Support Spotlight */}
+      {/* Section 4: Structured Lesson Plans */}
       <section className="py-16 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
           <motion.div {...fadeIn} className="order-2 lg:order-1 relative">
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] scale-105 -rotate-2"></div>
             <div className="relative z-10 aspect-video rounded-[2rem] overflow-hidden shadow-xl bg-slate-100 flex items-center justify-center">
               <motion.img
-                key={images[2]}
+                key={images[5]}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: 1 }}
-                src={images[2]}
-                alt="Hints System"
+                src={images[5]}
+                alt="Structured Lesson Plans"
                 className="w-full h-full object-cover"
               />
             </div>
           </motion.div>
           <motion.div {...fadeIn} className="order-1 lg:order-2">
-            <div className="text-[#6C63FF] font-bold text-[10px] tracking-[0.2em] mb-2">GUIDED LEARNING SYSTEM</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-4 leading-tight">Built-In Hints That Teach</h2>
-            <div className="space-y-4 text-slate-600 text-base leading-relaxed">
-              <p>Every worksheet includes optional problem-solving hints that help children understand the process independently.</p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2"><div className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0"><Check size={12} /></div> Guided questions for every problem</li>
-                <li className="flex items-center gap-2"><div className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0"><Check size={12} /></div> Step-by-step concept breakdowns</li>
-                <li className="flex items-center gap-2"><div className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0"><Check size={12} /></div> Independent confidence building</li>
-              </ul>
-              <button onClick={() => navigate('/get-started')} className="bg-[#5DCEA0] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-emerald-100 transition-all mt-4">
-                See Sample Worksheets
+            <div className="text-[#6C63FF] font-black text-[10px] tracking-[0.2em] mb-3 uppercase">Guided Growth Structure</div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-4 leading-tight">Lesson Plans Built by Subject & Subtopic</h2>
+            <div className="space-y-6 text-slate-600 text-base leading-relaxed text-left">
+              <p className="font-medium text-lg text-slate-700">Daily practice is intentional and progressive, following a clear curriculum for every subject.</p>
+
+              <div className="space-y-4">
+                <div className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 items-center">
+                  <div className="w-10 h-10 bg-indigo-100 text-[#6C63FF] rounded-xl flex items-center justify-center shrink-0">
+                    <BookOpen size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-[#1A1F3A] text-sm uppercase tracking-wider mb-1 leading-none">Structured Progress</h4>
+                    <p className="text-sm font-medium text-slate-500">Each subject follows a sequential lesson plan designed to build skills daily.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 items-center">
+                  <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                    <Target size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-[#1A1F3A] text-sm uppercase tracking-wider mb-1 leading-none">Focused Subtopics</h4>
+                    <p className="text-sm font-medium text-slate-500">Break down big subjects into manageable topics like Addition or Phonics.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 items-center">
+                  <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
+                    <Zap size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-[#1A1F3A] text-sm uppercase tracking-wider mb-1 leading-none">Grade-Level Mastery</h4>
+                    <p className="text-sm font-medium text-slate-500">Every worksheet is generated specifically for your child's exact skill level and topic.</p>
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-indigo-100 transition-all mt-4 w-full md:w-auto">
+                Start Learning Plan
               </button>
             </div>
           </motion.div>
@@ -365,7 +393,7 @@ export const HomeView: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               <ul className="space-y-3">
                 <li className="flex items-center gap-2 font-bold text-slate-700 text-sm"><CheckCircle className="text-emerald-500" size={16} /> Daily Math & Reading</li>
-                <li className="flex items-center gap-2 font-bold text-slate-700 text-sm"><CheckCircle className="text-emerald-500" size={16} /> Unlimited Hints</li>
+                <li className="flex items-center gap-2 font-bold text-slate-700 text-sm"><CheckCircle className="text-emerald-500" size={16} /> Structured Lesson Plans</li>
                 <li className="flex items-center gap-2 font-bold text-slate-700 text-sm"><CheckCircle className="text-emerald-500" size={16} /> Custom Learning Plans</li>
               </ul>
               <ul className="space-y-3">
