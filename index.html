@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,70 +8,84 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script>
         // Ensure process.env exists without wiping out existing values
         window.process = window.process || { env: {} };
         window.process.env = window.process.env || {};
-        
+
         // Bridge GEMINI_API_KEY to API_KEY if needed (matching user's Vercel config)
         if (!window.process.env.API_KEY && window.process.env.GEMINI_API_KEY) {
             window.process.env.API_KEY = window.process.env.GEMINI_API_KEY;
         }
 
         // Global error tracking for debugging
-        window.onerror = function(msg, url, line, col, error) {
+        window.onerror = function (msg, url, line, col, error) {
             console.error("EduKid Runtime Error: " + msg + " at " + url + ":" + line);
         };
     </script>
+    <script src="https://fast.wistia.com/player.js" async></script>
     <style>
         body {
             font-family: 'Urbanist', sans-serif;
             -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
             background-color: #F7F9FC;
         }
+
         @media print {
             .no-print {
                 display: none !important;
             }
+
             .print-only {
                 display: block !important;
             }
+
             body {
                 background-color: white !important;
             }
         }
+
         .premium-shadow {
             box-shadow: 0 10px 30px -10px rgba(108, 99, 255, 0.15);
         }
+
         .glass {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+
         /* Custom scrollbar for better aesthetics */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #E2E8F0;
             border-radius: 20px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #CBD5E1;
         }
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .no-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
@@ -83,9 +98,11 @@
 }
 </script>
 </head>
+
 <body class="text-[#1A1F3A] overflow-x-hidden">
     <div id="root"></div>
     <!-- Explicit module entry point to ensure loading -->
     <script type="module" src="./index.tsx"></script>
 </body>
+
 </html>

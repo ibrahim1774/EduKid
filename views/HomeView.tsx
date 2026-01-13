@@ -4,22 +4,62 @@ import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Pl
 import { generateAppImage } from '../services/geminiService';
 import { Link, useNavigate } from 'react-router-dom';
 
-// Fast-loading, high-quality defaults for immediate first-paint
-const DEFAULT_IMAGES = [
-  "/assets/images/hero.png",
-  "/assets/images/fresh-practice.png",
-  "/assets/images/hints.png",
-  "/assets/images/printable.png",
-  "/assets/images/family.png",
-  "/assets/images/custom-plans.png",
-  "/assets/images/build-time.png",
-  "/assets/images/custom-practice.png",
-  "/assets/images/how-to.png"
-];
+// Real app screenshots
+const APP_IMAGES = {
+  hero: "/assets/images/dashboard-full.png",
+  worksheet: "/assets/images/worksheet-view.png",
+  dashboard: "/assets/images/dashboard-lesson.png",
+  lesson: "/assets/images/lesson-modal.png",
+  full: "/assets/images/dashboard-full.png"
+};
+
+// Wistia Video Component
+const WistiaEmbed: React.FC<{ mediaId: string; aspect?: string }> = ({ mediaId, aspect = "1.7777777777777777" }) => {
+  useEffect(() => {
+    // Load the specific media script
+    const script = document.createElement('script');
+    script.src = `https://fast.wistia.com/embed/${mediaId}.js`;
+    script.async = true;
+    script.type = 'module';
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script if needed (optional)
+      // document.head.removeChild(script);
+    };
+  }, [mediaId]);
+
+  return (
+    <div className="w-full h-full relative overflow-hidden rounded-[inherit]">
+      <style>{`
+        wistia-player[media-id='${mediaId}']:not(:defined) { 
+          background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/${mediaId}/swatch'); 
+          display: block; 
+          filter: blur(5px); 
+          padding-top: ${100 / parseFloat(aspect)}%; 
+        }
+      `}</style>
+      {/* @ts-ignore */}
+      <wistia-player
+        media-id={mediaId}
+        aspect={aspect}
+        auto-play="true"
+        muted="true"
+        play-button="false"
+        playbar="false"
+        fullscreen-button="false"
+        settings-control="false"
+        small-play-button="false"
+        volume-control="false"
+        playback-rate-control="false"
+        class="w-full h-full"
+      />
+    </div>
+  );
+};
 
 export const HomeView: React.FC = () => {
   const navigate = useNavigate();
-  const [images] = useState<string[]>(DEFAULT_IMAGES);
   const isAiGenerated = true;
 
   useEffect(() => {
@@ -69,30 +109,17 @@ export const HomeView: React.FC = () => {
 
           <motion.div
             initial={{ opacity: 0, scale: 0.95, rotate: 2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 1 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
             className="relative"
           >
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-40"></div>
-            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-xl p-2 bg-white border border-slate-100 aspect-video flex items-center justify-center group">
-              <AnimatePresence mode='wait'>
-                <motion.img
-                  key={images[0]}
-                  initial={{ opacity: 0.8 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
-                  src={images[0]}
-                  alt="Children Learning"
-                  className="rounded-[1.75rem] w-full h-full object-cover shadow-inner"
-                />
-              </AnimatePresence>
-              {!isAiGenerated && (
-                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
-                  <Sparkles size={12} className="animate-pulse" />
-                  AI DESIGNING UNIQUE ART...
-                </div>
-              )}
+            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-2xl p-2 bg-white border border-slate-100 aspect-video flex items-center justify-center group">
+              <WistiaEmbed mediaId="ggwj6mbnze" />
+              <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
+                <Play size={12} className="fill-current" />
+                WATCH PRODUCT DEMO
+              </div>
             </div>
           </motion.div>
         </div>
@@ -127,10 +154,10 @@ export const HomeView: React.FC = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard img={images[1]} icon="📅" title="Fresh Practice" desc="Daily worksheets matched perfectly to grade and focus." />
-            <FeatureCard img={images[5]} icon="🎯" title="Topic Mastery" desc="Structured subtopics ensure your child masters one concept at a time." />
-            <FeatureCard img={images[3]} icon="🖨️" title="Printable PDFs" desc="High-quality layouts designed for offline practice." />
-            <FeatureCard img={images[5]} icon="🎓" title="Custom Plans" desc="Target struggles specifically with every daily sheet." />
+            <FeatureCard img={APP_IMAGES.dashboard} icon="📅" title="Fresh Practice" desc="Daily worksheets matched perfectly to grade and focus." />
+            <FeatureCard videoId="dcm3t8p8ap" icon="🎯" title="Topic Mastery" desc="Structured subtopics ensure your child masters one concept at a time." />
+            <FeatureCard img={APP_IMAGES.worksheet} icon="🖨️" title="Printable PDFs" desc="High-quality layouts designed for offline practice." />
+            <FeatureCard img={APP_IMAGES.full} icon="🎓" title="Custom Plans" desc="Target struggles specifically with every daily sheet." />
           </div>
         </div>
       </section>
@@ -142,10 +169,9 @@ export const HomeView: React.FC = () => {
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] scale-105 -rotate-2"></div>
             <div className="relative z-10 aspect-video rounded-[2rem] overflow-hidden shadow-xl bg-slate-100 flex items-center justify-center">
               <motion.img
-                key={images[5]}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: 1 }}
-                src={images[5]}
+                src={APP_IMAGES.lesson}
                 alt="Structured Lesson Plans"
                 className="w-full h-full object-cover"
               />
@@ -209,10 +235,9 @@ export const HomeView: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-tr from-indigo-100 to-transparent rounded-[2rem] -z-10 blur-xl"></div>
             <div className="aspect-video rounded-[2rem] overflow-hidden shadow-xl border border-white bg-slate-100 flex items-center justify-center">
               <motion.img
-                key={images[4]}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: 1 }}
-                src={images[4]}
+                src={APP_IMAGES.full}
                 alt="Multi-Child Showcase"
                 className="w-full h-full object-cover"
               />
@@ -250,8 +275,8 @@ export const HomeView: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
           <motion.div {...fadeIn} className="relative">
             <div className="absolute inset-0 bg-indigo-50 rounded-[2rem] -rotate-1 scale-105"></div>
-            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg">
-              <img src={images[6]} alt="Child building habits" className="w-full h-full object-cover" />
+            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg bg-slate-50">
+              <WistiaEmbed mediaId="j8krn7mri1" aspect="1.33333333" />
             </div>
           </motion.div>
           <motion.div {...fadeIn}>
@@ -307,8 +332,8 @@ export const HomeView: React.FC = () => {
           </motion.div>
           <motion.div {...fadeIn} className="order-1 lg:order-2 relative">
             <div className="absolute inset-0 bg-[#5A52E0]/5 rounded-[2rem] rotate-2 scale-105"></div>
-            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg">
-              <img src={images[7]} alt="Daily custom practice" className="w-full h-full object-cover" />
+            <div className="relative z-10 aspect-[4/3] rounded-[2rem] overflow-hidden shadow-lg bg-slate-50">
+              <WistiaEmbed mediaId="ro3mwosmus" aspect="1.33333333" />
             </div>
           </motion.div>
         </div>
@@ -354,8 +379,8 @@ export const HomeView: React.FC = () => {
                   <p className="text-indigo-100 text-lg mb-6 font-medium">Each subject can have its own daily worksheet, and parents can update subjects or focus areas at any time as the child progresses.</p>
                   <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start Now <ArrowRight size={20} /></button>
                 </div>
-                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                  <img src={images[8]} alt="Generating worksheets" className="w-full h-full object-cover" />
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#1d2342]">
+                  <WistiaEmbed mediaId="aepfpq0du0" />
                 </div>
               </div>
             </div>
@@ -432,14 +457,18 @@ const StepCard = ({ step, color, icon, title, desc }: { step: number, color: str
   </motion.div>
 );
 
-const FeatureCard = ({ img, icon, title, desc }: { img: string, icon: string, title: string, desc: string }) => (
+const FeatureCard = ({ img, videoId, icon, title, desc }: { img?: string, videoId?: string, icon: string, title: string, desc: string }) => (
   <motion.div
     whileHover={{ y: -4 }}
     className="bg-white rounded-[1.5rem] overflow-hidden shadow-md shadow-slate-200/50 border border-slate-100 flex flex-col h-full"
   >
     <div className="relative h-48 bg-slate-100 flex items-center justify-center">
-      <motion.img initial={{ opacity: 0.8 }} animate={{ opacity: 1 }} src={img} alt={title} className="w-full h-full object-cover" />
-      <div className="absolute top-2 right-2 w-9 h-9 bg-white rounded-lg shadow-md flex items-center justify-center text-lg z-10">
+      {videoId ? (
+        <WistiaEmbed mediaId={videoId} />
+      ) : (
+        <motion.img initial={{ opacity: 0.8 }} animate={{ opacity: 1 }} src={img} alt={title} className="w-full h-full object-cover" />
+      )}
+      <div className="absolute top-2 right-2 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-lg shadow-md flex items-center justify-center text-lg z-10">
         {icon}
       </div>
     </div>
