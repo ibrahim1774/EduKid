@@ -81,8 +81,7 @@ export const HomeView: React.FC = () => {
       <section className="relative overflow-hidden pt-10 pb-16 md:pt-20 md:pb-26 bg-gradient-to-br from-[#F5F3FF] via-white to-white">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-8 items-center">
           <motion.div {...fadeIn} className="z-10 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#6C63FF]/10 text-[#6C63FF] font-bold text-xs mb-4">
-              <span className="bg-[#6C63FF] text-white text-[9px] px-1.5 py-0.5 rounded-full mr-1">50% OFF</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#6C63FF]/10 text-[#6C63FF] font-bold text-xs mb-4 uppercase tracking-widest">
               <span>LEARN FROM TODAY</span>
             </div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-[1.2] mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] via-[#9333EA] to-[#DB2777]">
