@@ -528,6 +528,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
                           <p className="text-2xl text-slate-700 leading-loose font-medium whitespace-pre-wrap">
                             {content[activeTab]}
                           </p>
+
+                          {activeTab === 'breakdown' && (
+                            <div className="mt-8 rounded-2xl overflow-hidden shadow-2xl border-8 border-white">
+                              {/* @ts-ignore - custom wistia element */}
+                              <wistia-player media-id="ggwj6mbnze" aspect="1.7777777777777777"></wistia-player>
+                            </div>
+                          )}
                         </div>
                       );
                     })()}
