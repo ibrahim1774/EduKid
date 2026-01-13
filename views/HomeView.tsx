@@ -11,7 +11,8 @@ const APP_IMAGES = {
   dashboard: "/assets/images/dashboard-lesson.png",
   lesson: "/assets/images/lesson-modal.png",
   full: "/assets/images/dashboard-full.png",
-  features_worksheet: "/assets/images/features-worksheet.png"
+  features_worksheet: "/assets/images/features-worksheet.png",
+  hero_dashboard: "/assets/images/hero-dashboard.png"
 };
 
 // Wistia Video Component
@@ -115,12 +116,12 @@ export const HomeView: React.FC = () => {
             className="relative"
           >
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-100 rounded-full blur-3xl opacity-40"></div>
-            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-2xl p-2 bg-white border border-slate-100 aspect-video flex items-center justify-center group">
-              <WistiaEmbed mediaId="ggwj6mbnze" />
-              <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-[9px] font-bold text-indigo-600 shadow-lg border border-indigo-100">
-                <Play size={12} className="fill-current" />
-                WATCH PRODUCT DEMO
-              </div>
+            <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-2xl bg-white border border-slate-100 transform hover:scale-[1.02] transition-transform duration-500">
+              <img
+                src={APP_IMAGES.hero_dashboard}
+                alt="EduKid Dashboard"
+                className="w-full h-auto"
+              />
             </div>
           </motion.div>
         </div>
