@@ -501,7 +501,10 @@ export const HomeView: React.FC = () => {
               </ul>
             </div>
 
-            <button onClick={() => navigate('/get-started')} className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all">
+            <button
+              onClick={() => window.location.href = 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09'}
+              className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all"
+            >
               Start 3 Day Free Trial
             </button>
             <p className="mt-4 text-center text-slate-400 font-bold text-xs uppercase tracking-wide">Cancel anytime</p>
