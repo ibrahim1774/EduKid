@@ -47,14 +47,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
             {!user ? (
               <>
                 <Link to="/" className="text-slate-600 hover:text-[#6366F1] font-medium">Home</Link>
-                <Link to="/" className="text-slate-600 hover:text-[#6366F1] font-medium">About</Link>
                 <Link to="/login" className="text-slate-600 hover:text-[#6366F1] font-medium">Login</Link>
-                <Link
-                  to="/get-started"
-                  className="bg-[#FF7A59] hover:bg-[#ff6a42] text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-md active:scale-95"
-                >
-                  Join Now
-                </Link>
               </>
             ) : (
               <>
@@ -83,7 +76,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
               <>
                 <Link to="/" onClick={() => setMobileMenuOpen(false)} className="text-left py-2 font-medium">Home</Link>
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-left py-2 font-medium">Login</Link>
-                <Link to="/get-started" onClick={() => setMobileMenuOpen(false)} className="bg-[#FF7A59] text-white py-3 rounded-xl font-bold text-center">Sign Up</Link>
               </>
             ) : (
               <>

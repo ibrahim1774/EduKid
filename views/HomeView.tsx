@@ -75,6 +75,10 @@ export const HomeView: React.FC = () => {
     transition: { duration: 0.6, ease: "easeOut" as const }
   };
 
+  const scrollToPricing = () => {
+    document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="w-full bg-[#F7F9FC]">
       {/* Section 1: Hero Section */}
@@ -92,7 +96,7 @@ export const HomeView: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
               <button
-                onClick={() => navigate('/get-started')}
+                onClick={scrollToPricing}
                 className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
               >
                 Start 3 Day Free Trial <ArrowRight size={20} />
@@ -156,7 +160,7 @@ export const HomeView: React.FC = () => {
             </div>
 
             <button
-              onClick={() => navigate('/get-started')}
+              onClick={scrollToPricing}
               className="bg-[#1A1F3A] hover:bg-black text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center gap-3"
             >
               Start Custom Path <ArrowRight size={22} />
@@ -199,6 +203,23 @@ export const HomeView: React.FC = () => {
             <StepCard step={4} color="bg-[#38BDF8]" icon={<BookOpen className="w-6 h-6" />} title="Daily Subjects" desc="Pick Math, Reading, Writing, Science." />
             <StepCard step={5} color="bg-[#FBBF24]" icon={<FileText className="w-6 h-6" />} title="Get Worksheets" desc="Fresh practice appears every morning." />
           </div>
+        </div>
+      </section>
+
+      {/* NEW MID-PAGE CTA */}
+      <section className="py-12 bg-[#F5F3FF]">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <motion.div {...fadeIn}>
+            <h3 className="text-2xl md:text-3xl font-black text-[#1A1F3A] mb-6">
+              Ready to give your child the best learning experience?
+            </h3>
+            <button
+              onClick={scrollToPricing}
+              className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center gap-3 mx-auto"
+            >
+              Start 3 Day Free Trial <ArrowRight size={22} />
+            </button>
+          </motion.div>
         </div>
       </section>
 
@@ -272,7 +293,7 @@ export const HomeView: React.FC = () => {
                 <div className="text-white">
                   <h3 className="text-2xl md:text-3xl font-extrabold mb-4">Complete Flexibility</h3>
                   <p className="text-indigo-100 text-lg mb-6 font-medium">Each subject can have its own daily worksheet, and parents can update subjects or focus areas at any time as the child progresses.</p>
-                  <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start Now <ArrowRight size={20} /></button>
+                  <button onClick={scrollToPricing} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start Now <ArrowRight size={20} /></button>
                 </div>
                 <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#1d2342]">
                   <WistiaEmbed mediaId="aepfpq0du0" />
@@ -347,7 +368,7 @@ export const HomeView: React.FC = () => {
                 </div>
               </div>
 
-              <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-indigo-100 transition-all mt-4 w-full md:w-auto">
+              <button onClick={scrollToPricing} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-indigo-100 transition-all mt-4 w-full md:w-auto">
                 Start Learning Plan
               </button>
             </div>
@@ -441,7 +462,7 @@ export const HomeView: React.FC = () => {
 
 
       {/* Section 6: Pricing Section */}
-      <section className="py-16 bg-[#1A1F3A] text-white relative overflow-hidden">
+      <section id="pricing-section" className="py-16 bg-[#1A1F3A] text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-[#6C63FF]/5 -skew-x-12"></div>
         <div className="max-w-4xl mx-auto px-4 relative z-10">
           <motion.div {...fadeIn} className="text-center mb-10">
