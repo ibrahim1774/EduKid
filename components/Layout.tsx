@@ -20,8 +20,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
       to={to}
       onClick={() => setMobileMenuOpen(false)}
       className={`px-4 py-2 rounded-full transition-all duration-200 ${activeView === to
-          ? 'bg-[#6366F1] text-white shadow-lg'
-          : 'text-slate-600 hover:bg-slate-100'
+        ? 'bg-[#6366F1] text-white shadow-lg'
+        : 'text-slate-600 hover:bg-slate-100'
         }`}
     >
       {label}
@@ -39,7 +39,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout }) => {
             <div className="w-10 h-10 bg-[#6366F1] rounded-xl flex items-center justify-center shadow-lg">
               <BookOpen className="text-white w-6 h-6" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-800">EduKid<span className="text-[#6366F1]">.ai</span></span>
+            <span className="text-2xl font-bold tracking-tight text-slate-800">EduKid</span>
           </Link>
 
           {/* Desktop Nav */}

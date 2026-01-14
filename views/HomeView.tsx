@@ -208,7 +208,7 @@ export const HomeView: React.FC = () => {
           <motion.div {...fadeIn} className="order-2 lg:order-1">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-6 leading-tight">Designed for Daily, Custom Practice</h2>
             <p className="text-lg text-slate-600 mb-6 leading-relaxed font-medium">
-              Every child's learning journey is different. EduKid.ai allows parents to generate fresh worksheets each day, tailored specifically to each child's unique learning profile based on their grade level, selected subjects, and parent-chosen focus areas.
+              Every child's learning journey is different. EduKid allows parents to generate fresh worksheets each day, tailored specifically to each child's unique learning profile based on their grade level, selected subjects, and parent-chosen focus areas.
             </p>
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -414,7 +414,7 @@ export const HomeView: React.FC = () => {
           <motion.div {...fadeIn}>
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1F3A] mb-6 leading-tight">What Children Build Over Time</h2>
             <p className="text-lg text-slate-600 mb-6 leading-relaxed font-medium">
-              Daily learning is most effective when it becomes a natural part of a child's day. EduKid.ai supports steady learning habits by providing parent-generated worksheets customized to your child's specific grade and subjects.
+              Daily learning is most effective when it becomes a natural part of a child's day. EduKid supports steady learning habits by providing parent-generated worksheets customized to your child's specific grade and subjects.
             </p>
             <ul className="space-y-4">
               {[
