@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { HomeView } from './views/HomeView';
 import { LoginView } from './views/LoginView';
@@ -9,10 +9,16 @@ import { DashboardView } from './views/DashboardView';
 import { WorksheetView } from './views/WorksheetView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { trackPageView } from './lib/fbTracking';
 
 function AppContent() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView();
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await signOut();

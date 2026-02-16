@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
 import { generateAppImage } from '../services/geminiService';
 import { Link, useNavigate } from 'react-router-dom';
+import { trackInitiateCheckout } from '../lib/fbTracking';
 
 // Real app screenshots
 const APP_IMAGES = {
@@ -502,7 +503,10 @@ export const HomeView: React.FC = () => {
             </div>
 
             <button
-              onClick={() => window.location.href = 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09'}
+              onClick={() => {
+                trackInitiateCheckout(10.0, 'USD');
+                window.location.href = 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09';
+              }}
               className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all"
             >
               Start 3 Day Free Trial
