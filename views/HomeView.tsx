@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText } from 'lucide-react';
+import { CheckCircle, Zap, Shield, Sparkles, Printer, Headphones, ArrowRight, Play, Star, Check, BookOpen, Clock, Users, Database, Layout, Lightbulb, Target, FileText, Mail } from 'lucide-react';
 import { generateAppImage } from '../services/geminiService';
 import { Link, useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout } from '../lib/fbTracking';
@@ -110,6 +110,14 @@ export const HomeView: React.FC = () => {
               <div className="flex items-center gap-2">🔒 Secure</div>
               <div className="flex items-center gap-2">👪 Parent Approved</div>
               <div className="flex items-center gap-2">⭐ 4.9/5 Rating</div>
+            </div>
+            <div className="mt-5 flex items-center gap-3 bg-[#FFF8E7] border border-amber-200 rounded-2xl px-5 py-3 justify-center lg:justify-start">
+              <div className="flex items-center gap-1.5 bg-[#FFD97D] rounded-lg px-3 py-1 shrink-0">
+                <FileText size={13} className="text-amber-900" />
+                <span className="text-amber-900 font-black text-xs uppercase tracking-wider">5,000+ Worksheets</span>
+              </div>
+              <span className="text-slate-600 font-medium text-sm">Unlock a full library of printable worksheets — sent to your email on signup.</span>
+              <Mail size={15} className="text-amber-500 shrink-0" />
             </div>
           </motion.div>
 
@@ -322,6 +330,28 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
+      {/* 5,000+ Worksheets Mid-Page Callout */}
+      <section className="bg-[#1A1F3A] py-14 px-6">
+        <div className="max-w-3xl mx-auto text-center space-y-4">
+          <div className="inline-flex items-center gap-2 bg-[#FFD97D] rounded-full px-4 py-1.5">
+            <FileText size={13} className="text-amber-900" />
+            <span className="text-amber-900 font-black text-xs uppercase tracking-widest">Exclusive Member Offer</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white">5,000+ Digital Worksheets</h2>
+          <p className="text-slate-300 font-medium text-lg max-w-xl mx-auto">Every plan includes instant access to a massive library of grade-appropriate, printable worksheets — delivered straight to your inbox when you sign up.</p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+              <FileText size={20} className="text-[#FFD97D]" />
+            </div>
+            <ArrowRight size={18} className="text-slate-400" />
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+              <Mail size={20} className="text-emerald-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm">Math, Reading, Writing & Science — all subjects, all grades.</p>
+        </div>
+      </section>
+
       {/* Section 4: Structured Lesson Plans */}
       <section className="py-16 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
@@ -470,6 +500,12 @@ export const HomeView: React.FC = () => {
             <h2 className="text-3xl md:text-5xl font-extrabold mb-3">Simple Pricing</h2>
             <p className="text-lg text-indigo-200">Start with essentials. Add subjects as you go.</p>
           </motion.div>
+
+          <div className="flex items-center justify-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-5 py-3 mb-6">
+            <CheckCircle size={16} className="text-emerald-400 shrink-0" />
+            <span className="text-emerald-300 font-semibold text-sm">Includes 5,000+ digital worksheets — emailed to you instantly on signup</span>
+            <Mail size={14} className="text-emerald-400 shrink-0" />
+          </div>
 
           <motion.div
             whileHover={{ y: -4 }}
