@@ -114,9 +114,9 @@ export const HomeView: React.FC = () => {
             <div className="mt-5 flex items-center gap-3 bg-[#FFF8E7] border border-amber-200 rounded-2xl px-5 py-3 justify-center lg:justify-start">
               <div className="flex items-center gap-1.5 bg-[#FFD97D] rounded-lg px-3 py-1 shrink-0">
                 <FileText size={13} className="text-amber-900" />
-                <span className="text-amber-900 font-black text-xs uppercase tracking-wider">5,000+ Worksheets</span>
+                <span className="text-amber-900 font-black text-xs uppercase tracking-wider">🎁 Free Gift Included on Plan</span>
               </div>
-              <span className="text-slate-600 font-medium text-sm">Unlock a full library of printable worksheets — sent to your email on signup.</span>
+              <span className="text-slate-600 font-medium text-sm">5,000+ printable worksheets — sent to your email on signup.</span>
               <Mail size={15} className="text-amber-500 shrink-0" />
             </div>
           </motion.div>
@@ -335,7 +335,7 @@ export const HomeView: React.FC = () => {
         <div className="max-w-3xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 bg-[#FFD97D] rounded-full px-4 py-1.5">
             <FileText size={13} className="text-amber-900" />
-            <span className="text-amber-900 font-black text-xs uppercase tracking-widest">Exclusive Member Offer</span>
+            <span className="text-amber-900 font-black text-xs uppercase tracking-widest">🎁 Free Gift Included on Plan</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-white">5,000+ Digital Worksheets</h2>
           <p className="text-slate-300 font-medium text-lg max-w-xl mx-auto">Every plan includes instant access to a massive library of grade-appropriate, printable worksheets — delivered straight to your inbox when you sign up.</p>
@@ -503,7 +503,7 @@ export const HomeView: React.FC = () => {
 
           <div className="flex items-center justify-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-5 py-3 mb-6">
             <CheckCircle size={16} className="text-emerald-400 shrink-0" />
-            <span className="text-emerald-300 font-semibold text-sm">Includes 5,000+ digital worksheets — emailed to you instantly on signup</span>
+            <span className="text-emerald-300 text-sm"><span className="font-black text-white">🎁 Free Gift Included on Plan</span> — 5,000+ digital worksheets emailed to you instantly on signup</span>
             <Mail size={14} className="text-emerald-400 shrink-0" />
           </div>
 
