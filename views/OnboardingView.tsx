@@ -64,7 +64,7 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
             age: childData.age,
             grade: childData.grade,
             interests: [],
-            struggles: childData.struggles,
+            struggles: [],
             preferred_topics: childData.preferredTopics,
           }
         ])
