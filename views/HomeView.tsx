@@ -111,12 +111,12 @@ export const HomeView: React.FC = () => {
               <div className="flex items-center gap-2">👪 Parent Approved</div>
               <div className="flex items-center gap-2">⭐ 4.9/5 Rating</div>
             </div>
-            <div className="mt-5 bg-[#FFF8E7] border border-amber-200 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="flex items-center gap-1.5 bg-[#FFD97D] rounded-lg px-3 py-1.5 self-start sm:self-auto shrink-0">
+            <div className="mt-5 bg-[#FFF8E7] border border-amber-200 rounded-2xl px-5 py-4 flex flex-col items-center gap-3 text-center">
+              <div className="flex items-center gap-1.5 bg-[#FFD97D] rounded-lg px-3 py-1.5 shrink-0">
                 <FileText size={13} className="text-amber-900" />
                 <span className="text-amber-900 font-black text-xs uppercase tracking-wider">🎁 Free Gift Included on Plan</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-center">
                 <span className="text-slate-600 font-medium text-sm">5,000+ printable worksheets — sent to your email on signup.</span>
                 <Mail size={15} className="text-amber-500 shrink-0" />
               </div>
