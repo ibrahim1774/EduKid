@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHash } from 'crypto';
 
-const PIXEL_ID = '1287427660086229';
+const PIXEL_ID = '26490568997297314';
 const API_VERSION = 'v21.0';
 
 function hashData(value: string): string {
