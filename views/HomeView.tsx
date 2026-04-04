@@ -575,7 +575,9 @@ export const HomeView: React.FC = () => {
             <button
               onClick={() => {
                 trackInitiateCheckout(isYearly ? 60.0 : 10.0, 'USD');
-                window.location.href = 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09';
+                window.location.href = isYearly
+                  ? 'https://buy.stripe.com/YEARLY_PLAN_LINK_HERE'
+                  : 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09';
               }}
               className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all"
             >
