@@ -64,6 +64,7 @@ const WistiaEmbed: React.FC<{ mediaId: string; aspect?: string }> = ({ mediaId, 
 export const HomeView: React.FC = () => {
   const navigate = useNavigate();
   const isAiGenerated = true;
+  const [isYearly, setIsYearly] = useState(false);
 
   useEffect(() => {
     // Images are now static for performance and consistency
@@ -503,6 +504,24 @@ export const HomeView: React.FC = () => {
             <p className="text-lg text-indigo-200">Start with essentials. Add subjects as you go.</p>
           </motion.div>
 
+          {/* Monthly / Yearly Toggle */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <span className={`font-bold text-sm transition-colors ${!isYearly ? 'text-white' : 'text-indigo-300'}`}>Monthly</span>
+            <button
+              onClick={() => setIsYearly(!isYearly)}
+              className="relative w-14 h-7 rounded-full bg-[#6C63FF]/30 border border-[#6C63FF]/50 transition-colors"
+              aria-label="Toggle yearly pricing"
+            >
+              <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-[#6C63FF] shadow-md transition-all duration-300 ${isYearly ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'}`} />
+            </button>
+            <span className={`font-bold text-sm transition-colors ${isYearly ? 'text-white' : 'text-indigo-300'}`}>Yearly</span>
+            {isYearly && (
+              <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                Save 50%
+              </span>
+            )}
+          </div>
+
           <div className="flex items-center justify-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-5 py-3 mb-6">
             <CheckCircle size={16} className="text-emerald-400 shrink-0" />
             <span className="text-emerald-300 text-sm"><span className="font-black text-white">🎁 Free Gift Included on Plan</span> — 5,000+ digital worksheets emailed to you instantly on signup</span>
@@ -522,8 +541,21 @@ export const HomeView: React.FC = () => {
                 <p className="text-slate-500 font-medium text-base">Daily essentials for strong foundations.</p>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-extrabold text-[#6C63FF]">$10</div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">per child / month</div>
+                {isYearly ? (
+                  <>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="text-2xl font-bold text-slate-300 line-through">$120</div>
+                      <div className="text-5xl font-extrabold text-[#6C63FF]">$60</div>
+                    </div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">per child / year</div>
+                    <div className="mt-1 bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-3 py-0.5 rounded-full inline-block">50% OFF — just $5/mo</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-5xl font-extrabold text-[#6C63FF]">$10</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">per child / month</div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -542,12 +574,12 @@ export const HomeView: React.FC = () => {
 
             <button
               onClick={() => {
-                trackInitiateCheckout(10.0, 'USD');
+                trackInitiateCheckout(isYearly ? 60.0 : 10.0, 'USD');
                 window.location.href = 'https://buy.stripe.com/6oU00i3XK4iq7V82zY3cc09';
               }}
               className="w-full bg-[#6C63FF] text-white py-5 rounded-xl font-bold text-xl shadow-xl shadow-indigo-100 hover:bg-[#5A52E0] transition-all"
             >
-              Start 3 Day Free Trial
+              {isYearly ? 'Start 3 Day Free Trial — $60/yr' : 'Start 3 Day Free Trial'}
             </button>
             <p className="mt-4 text-center text-slate-400 font-bold text-xs uppercase tracking-wide">Cancel anytime</p>
           </motion.div>
