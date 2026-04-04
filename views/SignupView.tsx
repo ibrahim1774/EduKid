@@ -17,8 +17,8 @@ export const SignupView: React.FC = () => {
     if (searchParams.get('checkout') === 'success' && !purchaseTracked.current) {
       purchaseTracked.current = true;
       const plan = searchParams.get('plan');
-      const amount = plan === 'yearly' ? 60.0 : 10.0;
-      trackPurchase(amount, 'USD');
+      const value = plan === 'yearly' ? 60.0 : 10.0;
+      trackPurchase(value, 'USD');
     }
   }, [searchParams]);
 
