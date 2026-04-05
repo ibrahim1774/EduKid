@@ -76,15 +76,17 @@ export const OnboardingView: React.FC<OnboardingProps> = ({ onComplete }) => {
       onComplete(data);
 
       // Check if user already has an active subscription (Add Child flow)
-      const { data: sub } = await supabase
-        .from('subscriptions')
-        .select('id')
-        .eq('user_id', user!.id)
-        .in('status', ['active', 'trialing'])
-        .limit(1)
-        .single();
-
-      navigate(sub ? '/dashboard' : '/subscribe');
+      try {
+        const res = await fetch('/api/check-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user!.email }),
+        });
+        const subData = await res.json();
+        navigate(subData.active ? '/dashboard' : '/subscribe');
+      } catch {
+        navigate('/subscribe');
+      }
     } catch (err: any) {
       console.error('OnboardingView: Error saving profile:', err);
       alert(`Failed to save profile: ${err.message || 'Unknown error'}. Please try again.`);

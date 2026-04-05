@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 
 export const SubscriptionGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -10,35 +9,37 @@ export const SubscriptionGuard: React.FC<{ children: React.ReactNode }> = ({ chi
   const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!user?.email) {
       setLoading(false);
       return;
     }
 
     let attempts = 0;
     const isPostCheckout = searchParams.get('checkout') === 'success';
-    const maxAttempts = isPostCheckout ? 10 : 1;
+    const maxAttempts = isPostCheckout ? 5 : 1;
 
     const checkSubscription = async () => {
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('id')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'trialing'])
-        .limit(1)
-        .single();
+      try {
+        const res = await fetch('/api/check-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email }),
+        });
+        const data = await res.json();
 
-      if (data) {
-        setHasSubscription(true);
-        setLoading(false);
-      } else {
-        attempts++;
-        if (attempts < maxAttempts) {
-          // Webhook may not have fired yet — retry after 1 second
-          setTimeout(checkSubscription, 1000);
-        } else {
+        if (data.active) {
+          setHasSubscription(true);
           setLoading(false);
+        } else {
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(checkSubscription, 2000);
+          } else {
+            setLoading(false);
+          }
         }
+      } catch {
+        setLoading(false);
       }
     };
 
