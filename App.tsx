@@ -12,6 +12,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { SubscriptionGuard } from './components/SubscriptionGuard';
 import { PaymentView } from './views/PaymentView';
 import { trackPageView } from './lib/fbTracking';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function AppContent() {
   const { user, signOut } = useAuth();
@@ -85,10 +86,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
