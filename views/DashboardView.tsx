@@ -5,7 +5,8 @@ import { generateWorksheetAction } from '../services/geminiService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { trackPurchase } from '../lib/fbTracking';
 import { LearningCalendar } from '../components/LearningCalendar';
 import { isSameDay, format, startOfToday } from 'date-fns';
 import { COMMON_TOPICS } from '../lib/topics';
@@ -18,6 +19,7 @@ interface DashboardProps {
 export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAddChild }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [children, setChildren] = useState<any[]>([]);
   const [activeChildId, setActiveChildId] = useState<string | null>(null);
   const [worksheets, setWorksheets] = useState<any[]>([]);
@@ -30,6 +32,14 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   // Full Lesson State
   const [fullLessonWs, setFullLessonWs] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<keyof StructuredLesson>('overview');
+
+  // Track purchase after Stripe redirect
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'success') {
+      trackPurchase(10.0, 'USD');
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { ArrowLeft, Mail, Lock, UserPlus, Loader2 } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { trackPurchase } from '../lib/fbTracking';
 
 export const SignupView: React.FC = () => {
   const [email, setEmail] = React.useState('');
@@ -10,17 +9,6 @@ export const SignupView: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const purchaseTracked = useRef(false);
-
-  useEffect(() => {
-    if (searchParams.get('checkout') === 'success' && !purchaseTracked.current) {
-      purchaseTracked.current = true;
-      const plan = searchParams.get('plan');
-      const value = plan === 'yearly' ? 60.0 : 10.0;
-      trackPurchase(value, 'USD');
-    }
-  }, [searchParams]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();

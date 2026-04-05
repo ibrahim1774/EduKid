@@ -9,6 +9,8 @@ import { DashboardView } from './views/DashboardView';
 import { WorksheetView } from './views/WorksheetView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { SubscriptionGuard } from './components/SubscriptionGuard';
+import { PaymentView } from './views/PaymentView';
 import { trackPageView } from './lib/fbTracking';
 
 function AppContent() {
@@ -43,15 +45,25 @@ function AppContent() {
           }
         />
         <Route
+          path="/subscribe"
+          element={
+            <ProtectedRoute>
+              <PaymentView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardView
-                onViewWorksheet={(id, ansKey = false) => {
-                  navigate(`/worksheet/${id}${ansKey ? '?key=true' : ''}`);
-                }}
-                onAddChild={() => navigate('/onboarding')}
-              />
+              <SubscriptionGuard>
+                <DashboardView
+                  onViewWorksheet={(id, ansKey = false) => {
+                    navigate(`/worksheet/${id}${ansKey ? '?key=true' : ''}`);
+                  }}
+                  onAddChild={() => navigate('/onboarding')}
+                />
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
@@ -59,7 +71,9 @@ function AppContent() {
           path="/worksheet/:id"
           element={
             <ProtectedRoute>
-              <WorksheetView />
+              <SubscriptionGuard>
+                <WorksheetView />
+              </SubscriptionGuard>
             </ProtectedRoute>
           }
         />
