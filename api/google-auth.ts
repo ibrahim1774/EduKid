@@ -34,8 +34,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Check if user exists in Supabase Auth
-    const { data: userList } = await supabase.auth.admin.listUsers();
-    const existingUser = userList?.users?.find((u) => u.email === email);
+    const { data: { users } } = await supabase.auth.admin.listUsers({ filter: email });
+    const existingUser = users?.[0];
 
     let userId: string;
 
@@ -68,17 +68,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: linkError?.message || 'Failed to generate link' });
     }
 
-    // Extract token hash from the magic link
-    const actionLink = linkData.properties?.action_link;
-    if (!actionLink) {
-      return res.status(500).json({ error: 'No action link generated' });
-    }
-
-    const url = new URL(actionLink);
-    const token_hash = url.searchParams.get('token');
-
+    // Use the hashed_token from the response directly
+    const token_hash = linkData.properties?.hashed_token;
     if (!token_hash) {
-      return res.status(500).json({ error: 'No token in action link' });
+      return res.status(500).json({ error: 'No hashed_token in response' });
     }
 
     // Verify the OTP to get a real session
