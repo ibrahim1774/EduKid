@@ -62,6 +62,23 @@ export const OnboardingFlowView: React.FC = () => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError,   setSaveError]   = useState<string | null>(null);
 
+  // Handle Supabase auth error redirects (e.g. expired email confirmation link)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('error=')) {
+      const params = new URLSearchParams(hash.slice(1));
+      const errorDesc = params.get('error_description');
+      window.history.replaceState(null, '', window.location.pathname);
+      setDir(1);
+      setSlide(6);
+      setAuthError(
+        errorDesc
+          ? decodeURIComponent(errorDesc.replace(/\+/g, ' '))
+          : 'Your sign-in link has expired. Please sign in below.'
+      );
+    }
+  }, []);
+
   // Skip auth slide if already logged in
   useEffect(() => {
     if (user && slide === 6) {
