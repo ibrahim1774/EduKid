@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { ArrowLeft, Mail, Lock, UserPlus, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useGoogleLogin } from '@react-oauth/google';
 
 export const SignupView: React.FC = () => {
   const [email, setEmail] = React.useState('');
@@ -10,31 +9,36 @@ export const SignupView: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
+  const googleBtnRef = useRef<HTMLDivElement>(null);
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const res = await fetch('/api/google-auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ access_token: tokenResponse.access_token }),
+  const handleGoogleCredential = useCallback(async (credential: string) => {
+    setLoading(true);
+    setError(null);
+    const { data, error: authError } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: credential,
+    });
+    if (authError) { setError(authError.message); setLoading(false); return; }
+    if (data.user) navigate('/setup');
+  }, [navigate]);
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+    if (!clientId || !googleBtnRef.current) return;
+    const interval = setInterval(() => {
+      if (typeof (window as any).google !== 'undefined' && (window as any).google?.accounts?.id) {
+        clearInterval(interval);
+        (window as any).google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: any) => { void handleGoogleCredential(response.credential); },
         });
-        const data = await res.json();
-        if (data.access_token && data.refresh_token) {
-          await supabase.auth.setSession({
-            access_token: data.access_token,
-            refresh_token: data.refresh_token,
-          });
-          navigate('/setup');
-        } else {
-          setError(data.error || 'Google sign-in failed');
-        }
-      } catch {
-        setError('Google sign-in failed');
+        (window as any).google.accounts.id.renderButton(googleBtnRef.current!, {
+          theme: 'outline', size: 'large', width: 400, text: 'continue_with',
+        });
       }
-    },
-    onError: () => setError('Google sign-in was cancelled'),
-  });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [handleGoogleCredential]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,23 +46,17 @@ export const SignupView: React.FC = () => {
     setError(null);
 
     try {
-      console.log('SignupView: Attempting signup for:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: window.location.origin + '/dashboard',
-        },
+        options: { emailRedirectTo: window.location.origin + '/dashboard' },
       });
 
-      console.log('SignupView: Signup response data:', data);
       if (error) throw error;
 
       if (data.session) {
-        console.log('SignupView: Session created immediately');
         navigate('/setup');
       } else if (data.user) {
-        console.log('SignupView: User created but no session. Email confirmation likely required');
         setError('Account created! Please check your email to confirm your account before logging in.');
       }
     } catch (err: any) {
@@ -86,13 +84,13 @@ export const SignupView: React.FC = () => {
           </div>
         )}
 
-        <button
-          onClick={() => googleLogin()}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-4 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm"
-        >
-          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.08 24.08 0 0 0 0 21.56l7.98-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          Continue with Google
-        </button>
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="animate-spin text-[#6366F1]" size={32} />
+          </div>
+        ) : (
+          <div ref={googleBtnRef} className="flex justify-center mb-2" />
+        )}
 
         <div className="flex items-center gap-3 my-6">
           <div className="flex-1 h-px bg-slate-200"></div>

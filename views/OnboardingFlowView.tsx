@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, ArrowLeft, Mail, Lock, Loader2,
   Check, Sparkles, BookOpen, UserPlus,
 } from 'lucide-react';
-import { useGoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Grade, Subject } from '../types';
@@ -104,39 +103,43 @@ export const OnboardingFlowView: React.FC = () => {
     }));
   };
 
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
   const onAuthSuccess = (id: string, email: string) => {
     setAuthed({ id, email });
     setAuthLoading(false);
     advance();
   };
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (token) => {
-      setAuthLoading(true);
-      setAuthError(null);
-      try {
-        const res  = await fetch('/api/google-auth', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ access_token: token.access_token }),
+  const handleGoogleCredential = useCallback(async (credential: string) => {
+    setAuthLoading(true);
+    setAuthError(null);
+    const { data, error: authError } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: credential,
+    });
+    if (authError) { setAuthError(authError.message); setAuthLoading(false); return; }
+    if (data.user) onAuthSuccess(data.user.id, data.user.email!);
+  }, []);
+
+  useEffect(() => {
+    if (slide !== 6) return;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+    if (!clientId || !googleBtnRef.current) return;
+    const interval = setInterval(() => {
+      if (typeof (window as any).google !== 'undefined' && (window as any).google?.accounts?.id) {
+        clearInterval(interval);
+        (window as any).google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: any) => { void handleGoogleCredential(response.credential); },
         });
-        const data = await res.json();
-        if (data.access_token && data.refresh_token) {
-          const { data: sd } = await supabase.auth.setSession({
-            access_token:  data.access_token,
-            refresh_token: data.refresh_token,
-          });
-          if (sd.user) onAuthSuccess(sd.user.id, sd.user.email!);
-          else { setAuthError('Could not establish session. Try again.'); setAuthLoading(false); }
-        } else {
-          setAuthError(data.error || 'Google sign-in failed.'); setAuthLoading(false);
-        }
-      } catch {
-        setAuthError('Google sign-in failed. Please try again.'); setAuthLoading(false);
+        (window as any).google.accounts.id.renderButton(googleBtnRef.current!, {
+          theme: 'outline', size: 'large', width: 400, text: 'continue_with',
+        });
       }
-    },
-    onError: () => { setAuthError('Google sign-in was cancelled.'); setAuthLoading(false); },
-  });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [slide, handleGoogleCredential]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -447,15 +450,8 @@ export const OnboardingFlowView: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Google — identical to SignupView */}
-                    <button
-                      onClick={() => googleLogin()}
-                      disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-4 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm disabled:opacity-60"
-                    >
-                      <GoogleIcon />
-                      Continue with Google
-                    </button>
+                    {/* Google — rendered by Google Identity Services */}
+                    <div ref={googleBtnRef} className="flex justify-center" />
 
                     <div className="flex items-center gap-3 my-5">
                       <div className="flex-1 h-px bg-slate-200" />
