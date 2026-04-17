@@ -4,7 +4,7 @@ import { Layout } from './components/Layout';
 import { HomeView } from './views/HomeView';
 import { LoginView } from './views/LoginView';
 import { SignupView } from './views/SignupView';
-import { OnboardingView } from './views/OnboardingView';
+import { OnboardingFlowView } from './views/OnboardingFlowView';
 import { DashboardView } from './views/DashboardView';
 import { WorksheetView } from './views/WorksheetView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -37,14 +37,7 @@ function AppContent() {
         <Route path="/" element={<HomeView />} />
         <Route path="/login" element={<LoginView />} />
         <Route path="/get-started" element={<SignupView />} />
-        <Route
-          path="/onboarding"
-          element={
-            <ProtectedRoute>
-              <OnboardingView onComplete={() => { }} user={user ? { email: user.email! } : { email: '' }} />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/onboarding" element={<OnboardingFlowView />} />
         <Route
           path="/subscribe"
           element={
