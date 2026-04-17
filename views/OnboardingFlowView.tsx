@@ -20,6 +20,13 @@ const ALL_SUBJECTS: { value: Subject; emoji: string }[] = [
   { value: Subject.History, emoji: '🌍' },
 ];
 
+// ── Shared button classes ─────────────────────────────────────────────────────
+const btn = {
+  primary: 'w-full bg-gradient-to-r from-[#6366F1] to-[#818CF8] text-white py-4 rounded-full font-bold tracking-wide text-base shadow-lg shadow-indigo-300/40 flex items-center justify-center gap-2 hover:from-[#5558E3] hover:to-[#6366F1] transition-all duration-200 active:scale-[0.98]',
+  coral:   'w-full bg-gradient-to-r from-[#FF7A59] to-[#FF5A3C] text-white py-4 rounded-full font-bold tracking-wide text-base shadow-lg shadow-orange-300/40 flex items-center justify-center gap-2 hover:from-[#e8694a] hover:to-[#e84a2a] transition-all duration-200 active:scale-[0.98]',
+  white:   'w-full bg-white/95 backdrop-blur-sm text-[#6366F1] border border-white/50 py-4 rounded-full font-bold tracking-wide text-base shadow-lg shadow-black/10 flex items-center justify-center gap-2 hover:bg-white transition-all duration-200 active:scale-[0.98]',
+};
+
 // ── Google SVG ───────────────────────────────────────────────────────────────
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48">
@@ -68,7 +75,6 @@ export const OnboardingFlowView: React.FC = () => {
   const toggle  = (sub: Subject) =>
     setChildSubjects(prev => prev.includes(sub) ? prev.filter(s => s !== sub) : [...prev, sub]);
 
-  // ── After auth: advance to child profile slide ────────────────────────────
   const onAuthSuccess = (id: string, email: string) => {
     setAuthed({ id, email });
     setAuthLoading(false);
@@ -126,7 +132,6 @@ export const OnboardingFlowView: React.FC = () => {
     }
   };
 
-  // ── Save child + navigate to paywall ─────────────────────────────────────
   const handleSaveChild = async () => {
     const uid   = authedUser?.id    ?? user?.id;
     const umail = authedUser?.email ?? user?.email;
@@ -161,7 +166,6 @@ export const OnboardingFlowView: React.FC = () => {
     }
   };
 
-  // ── Slide transition ──────────────────────────────────────────────────────
   const variants = {
     enter:  (d: number) => ({ opacity: 0, y: d > 0 ? 20 : -20 }),
     center: { opacity: 1, y: 0 },
@@ -169,11 +173,13 @@ export const OnboardingFlowView: React.FC = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden font-sans select-none">
+    // No font-sans — inherits Urbanist from body
+    <div className="h-screen overflow-hidden select-none">
+
       {/* ── Progress bar ─────────────────────────────────────────────────── */}
       <div className="fixed top-0 left-0 w-full h-[3px] bg-black/10 z-50">
         <motion.div
-          className="h-full bg-[#6366F1]"
+          className="h-full bg-gradient-to-r from-[#6366F1] to-[#818CF8]"
           initial={false}
           animate={{ width: `${(slide / TOTAL_SLIDES) * 100}%` }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
@@ -217,7 +223,6 @@ export const OnboardingFlowView: React.FC = () => {
           {slide === 1 && (
             <div className="h-screen bg-gradient-to-br from-[#4F46E5] via-[#6C63FF] to-[#8B5CF6] flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
               <div className="flex flex-col items-center gap-5 w-full max-w-sm">
-                {/* Hero image with glow */}
                 <div className="relative w-full">
                   <div className="absolute inset-0 bg-white/20 rounded-2xl blur-xl scale-90 translate-y-3" />
                   <img
@@ -227,28 +232,25 @@ export const OnboardingFlowView: React.FC = () => {
                   />
                 </div>
                 <div className="text-center space-y-2">
-                  <h1 className="text-2xl font-extrabold text-white leading-tight">
-                    Give your child the daily learning edge.
+                  <h1 className="text-[1.6rem] font-extrabold text-white leading-tight tracking-tight">
+                    Your child's school gives everyone the same worksheet.
+                    <span className="block text-white/90 italic">Yours deserves better.</span>
                   </h1>
-                  <p className="text-white/70 text-sm font-medium leading-relaxed">
-                    Personalized AI worksheets, matched to their grade — generated fresh every day.
+                  <p className="text-white/65 text-sm leading-relaxed">
+                    EduKid creates personalized daily practice built around exactly where your child is — not the average student.
                   </p>
                 </div>
               </div>
-              <button
-                onClick={advance}
-                className="w-full max-w-sm bg-white text-[#6366F1] py-4 rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all active:scale-[0.98]"
-              >
-                Let's Get Started <ChevronRight size={20} />
+              <button onClick={advance} className={btn.white} style={{ maxWidth: '24rem' }}>
+                Show Me How <ChevronRight size={18} />
               </button>
             </div>
           )}
 
           {/* ══ SLIDE 2 — Daily Practice Video ════════════════════════════ */}
           {slide === 2 && (
-            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-5">
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-                {/* Video */}
                 <div
                   className="w-full rounded-2xl overflow-hidden shadow-xl shadow-indigo-100 border border-slate-100 bg-slate-50"
                   style={{ aspectRatio: '16/9' }}
@@ -262,44 +264,41 @@ export const OnboardingFlowView: React.FC = () => {
                     style={{ border: 'none', display: 'block' }}
                   />
                 </div>
-                <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-[#6366F1] rounded-full px-3 py-1 text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-[#6366F1] rounded-full px-3 py-1 text-xs font-semibold">
                   <Sparkles size={12} /> AI-Generated Daily
                 </div>
                 <div className="text-center space-y-1.5">
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A] leading-tight">
-                    Fresh worksheets. Every single day.
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A] leading-tight tracking-tight">
+                    Most kids practice the wrong things.
                   </h2>
-                  <p className="text-slate-500 text-sm font-medium">
-                    Tailored to grade, subject, and focus — ready each morning.
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Generic homework doesn't target your child's actual gaps. EduKid generates focused practice every day — matched to their exact grade and struggles.
                   </p>
                 </div>
               </div>
-              <button
-                onClick={advance}
-                className="w-full max-w-sm bg-[#6366F1] text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 hover:bg-[#5558E3] transition-all active:scale-[0.98]"
-              >
-                Next <ChevronRight size={20} />
+              <button onClick={advance} className={btn.primary} style={{ maxWidth: '24rem' }}>
+                Next <ChevronRight size={18} />
               </button>
             </div>
           )}
 
           {/* ══ SLIDE 3 — How It Works ════════════════════════════════════ */}
           {slide === 3 && (
-            <div className="h-screen bg-indigo-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+            <div className="h-screen bg-indigo-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-5">
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <div className="text-center space-y-1">
-                  <div className="inline-flex items-center gap-1.5 bg-white text-[#6366F1] border border-indigo-100 rounded-full px-3 py-1 text-xs font-bold shadow-sm">
+                  <div className="inline-flex items-center gap-1.5 bg-white text-[#6366F1] border border-indigo-100 rounded-full px-3 py-1 text-xs font-semibold shadow-sm">
                     How It Works
                   </div>
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A]">Designed for how parents use it.</h2>
-                  <p className="text-slate-500 text-sm">Four steps to your child's daily worksheet.</p>
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A] tracking-tight">Stop searching. Start seeing results.</h2>
+                  <p className="text-slate-500 text-sm">In four steps, your child gets practice that actually moves the needle.</p>
                 </div>
                 <div className="w-full space-y-2">
                   {[
-                    { num: '01', label: 'Create your free account',      accent: 'bg-indigo-600 text-white', row: 'bg-indigo-100/60' },
-                    { num: '02', label: "Set up your child's profile",   accent: 'bg-purple-600 text-white', row: 'bg-purple-100/60' },
-                    { num: '03', label: 'Choose subjects & focus topics', accent: 'bg-pink-500 text-white',  row: 'bg-pink-100/60' },
-                    { num: '04', label: "Generate today's worksheet",     accent: 'bg-emerald-600 text-white',row: 'bg-emerald-100/60' },
+                    { num: '01', label: 'Create your free account',       accent: 'bg-indigo-600 text-white', row: 'bg-indigo-100/60' },
+                    { num: '02', label: "Set up your child's profile",    accent: 'bg-purple-600 text-white', row: 'bg-purple-100/60' },
+                    { num: '03', label: 'Choose subjects & focus topics',  accent: 'bg-pink-500 text-white',  row: 'bg-pink-100/60' },
+                    { num: '04', label: "Generate today's worksheet",      accent: 'bg-emerald-600 text-white',row: 'bg-emerald-100/60' },
                   ].map(({ num, label, accent, row }, i) => (
                     <motion.div
                       key={num}
@@ -308,7 +307,7 @@ export const OnboardingFlowView: React.FC = () => {
                       transition={{ delay: i * 0.07, duration: 0.25 }}
                       className={`flex items-center gap-3 ${row} rounded-xl px-4 py-3 border border-white`}
                     >
-                      <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-xs flex-shrink-0 ${accent}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs flex-shrink-0 ${accent}`}>
                         {num}
                       </span>
                       <span className="font-semibold text-[#1A1F3A] text-sm">{label}</span>
@@ -317,18 +316,15 @@ export const OnboardingFlowView: React.FC = () => {
                   ))}
                 </div>
               </div>
-              <button
-                onClick={advance}
-                className="w-full max-w-sm bg-[#6366F1] text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 hover:bg-[#5558E3] transition-all active:scale-[0.98]"
-              >
-                Get Started <ChevronRight size={20} />
+              <button onClick={advance} className={btn.primary} style={{ maxWidth: '24rem' }}>
+                Sounds Good <ChevronRight size={18} />
               </button>
             </div>
           )}
 
-          {/* ══ SLIDE 4 — Daily Custom Worksheets ══════════════════════════════ */}
+          {/* ══ SLIDE 4 — Targeted Practice ══════════════════════════════ */}
           {slide === 4 && (
-            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-5">
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <img
                   src="/assets/images/dashboard-full.png"
@@ -336,34 +332,35 @@ export const OnboardingFlowView: React.FC = () => {
                   className="w-full max-h-44 object-contain rounded-2xl shadow-lg shadow-indigo-50 border border-slate-100"
                 />
                 <div className="text-center space-y-1">
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A]">Daily custom worksheets generated for your child.</h2>
-                  <p className="text-slate-500 text-sm">Fresh practice every day, tailored to their exact needs.</p>
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A] tracking-tight leading-tight">
+                    Practice that targets where they actually struggle.
+                  </h2>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Stop guessing what your child needs. Every worksheet is built around their specific grade, subjects, and focus areas — not the whole class.
+                  </p>
                 </div>
                 <div className="w-full space-y-2">
                   {[
-                    'Generated daily for your child\'s grade & focus areas',
+                    "Built around their grade & focus areas — not the class average",
                     'Covers Math, Reading, Writing, Science & History',
                     'Printable PDFs — no prep needed',
                   ].map((label) => (
-                    <div key={label} className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
-                      <Check size={15} className="text-emerald-500 flex-shrink-0" strokeWidth={3} />
+                    <div key={label} className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-2.5">
+                      <Check size={14} className="text-emerald-500 flex-shrink-0" strokeWidth={3} />
                       <span className="text-sm font-semibold text-[#1A1F3A]">{label}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <button
-                onClick={advance}
-                className="w-full max-w-sm bg-[#6366F1] text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 hover:bg-[#5558E3] transition-all active:scale-[0.98]"
-              >
-                Next <ChevronRight size={20} />
+              <button onClick={advance} className={btn.primary} style={{ maxWidth: '24rem' }}>
+                Next <ChevronRight size={18} />
               </button>
             </div>
           )}
 
-          {/* ══ SLIDE 5 — Built for Families ══════════════════════════════ */}
+          {/* ══ SLIDE 5 — Families ════════════════════════════════════════ */}
           {slide === 5 && (
-            <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+            <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-5">
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <img
                   src="/assets/images/dashboard-lesson.png"
@@ -371,27 +368,28 @@ export const OnboardingFlowView: React.FC = () => {
                   className="w-full max-h-44 object-contain rounded-2xl shadow-lg shadow-orange-100 border border-slate-100"
                 />
                 <div className="text-center space-y-1">
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A]">Built for the whole family.</h2>
-                  <p className="text-slate-500 text-sm">One account, every child covered.</p>
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A] tracking-tight leading-tight">
+                    Every child in your family — covered.
+                  </h2>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Different ages, different grades, different needs. One account handles all of it — no juggling, no guesswork.
+                  </p>
                 </div>
                 <div className="w-full space-y-2">
                   {[
                     'Add multiple children — each gets their own plan',
-                    'Track progress over time',
+                    'Track their progress over time',
                     'Works on any device — phone, tablet, desktop',
                   ].map((label) => (
-                    <div key={label} className="flex items-center gap-3 bg-white border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
-                      <Check size={15} className="text-orange-400 flex-shrink-0" strokeWidth={3} />
+                    <div key={label} className="flex items-center gap-3 bg-white border border-orange-100 rounded-xl px-4 py-2.5 shadow-sm">
+                      <Check size={14} className="text-orange-400 flex-shrink-0" strokeWidth={3} />
                       <span className="text-sm font-semibold text-[#1A1F3A]">{label}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <button
-                onClick={advance}
-                className="w-full max-w-sm bg-[#FF7A59] text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-orange-100 flex items-center justify-center gap-2 hover:bg-[#e8694a] transition-all active:scale-[0.98]"
-              >
-                Create My Account <ChevronRight size={20} />
+              <button onClick={advance} className={btn.coral} style={{ maxWidth: '24rem' }}>
+                Create My Free Account <ChevronRight size={18} />
               </button>
             </div>
           )}
@@ -411,8 +409,8 @@ export const OnboardingFlowView: React.FC = () => {
                     <div className="w-16 h-16 bg-[#6366F1]/10 rounded-2xl flex items-center justify-center mx-auto mb-5 text-[#6366F1]">
                       <UserPlus size={32} />
                     </div>
-                    <h2 className="text-2xl font-extrabold text-slate-900 mb-1 text-center">Create Your Account</h2>
-                    <p className="text-slate-500 mb-6 text-center text-sm">Join thousands of parents building a brighter future.</p>
+                    <h2 className="text-2xl font-extrabold text-slate-900 mb-1 text-center tracking-tight">Create Your Account</h2>
+                    <p className="text-slate-500 mb-6 text-center text-sm">Start building the habit that changes everything.</p>
 
                     {authError && (
                       <div className="bg-red-50 text-red-500 p-4 rounded-xl text-sm font-medium mb-5 animate-in fade-in slide-in-from-top-2">
@@ -487,7 +485,6 @@ export const OnboardingFlowView: React.FC = () => {
           {/* ══ SLIDE 7 — Child Profile ════════════════════════════════════ */}
           {slide === 7 && (
             <div className="h-screen bg-white flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              {/* Subtle top strip */}
               <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-transparent pointer-events-none" />
 
               <div className="relative flex-1 flex flex-col justify-center gap-4 w-full max-w-sm">
@@ -495,8 +492,12 @@ export const OnboardingFlowView: React.FC = () => {
                   <div className="w-12 h-12 bg-[#6366F1] rounded-xl flex items-center justify-center mx-auto mb-3 text-white shadow-lg shadow-indigo-200">
                     <BookOpen size={22} />
                   </div>
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A] mb-1">Tell us about your child.</h2>
-                  <p className="text-slate-500 text-sm">We'll personalize their worksheets from day one.</p>
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A] mb-1 tracking-tight">
+                    Last step — let's meet your child.
+                  </h2>
+                  <p className="text-slate-500 text-sm">
+                    Tell us a little about them and we'll build their first worksheet right away.
+                  </p>
                 </div>
 
                 {saveError && (
@@ -506,7 +507,6 @@ export const OnboardingFlowView: React.FC = () => {
                 )}
 
                 <div className="space-y-3">
-                  {/* Name */}
                   <div>
                     <label className="text-xs font-bold text-slate-600 block mb-1.5">Child's First Name</label>
                     <input
@@ -518,7 +518,6 @@ export const OnboardingFlowView: React.FC = () => {
                     />
                   </div>
 
-                  {/* Age + Grade */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs font-bold text-slate-600 block mb-1.5">Age</label>
@@ -546,7 +545,6 @@ export const OnboardingFlowView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Subjects */}
                   <div>
                     <label className="text-xs font-bold text-slate-600 block mb-2">Subjects to Focus On</label>
                     <div className="flex flex-wrap gap-2">
@@ -557,7 +555,7 @@ export const OnboardingFlowView: React.FC = () => {
                             key={sub}
                             type="button"
                             onClick={() => toggle(sub)}
-                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all active:scale-95 ${
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold border-2 transition-all active:scale-95 ${
                               selected
                                 ? 'bg-[#6366F1] text-white border-[#6366F1] shadow-md shadow-indigo-200'
                                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
@@ -576,7 +574,7 @@ export const OnboardingFlowView: React.FC = () => {
                 <button
                   disabled={!childName.trim() || saveLoading}
                   onClick={handleSaveChild}
-                  className="w-full bg-[#FF7A59] disabled:opacity-50 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-orange-100 flex items-center justify-center gap-2 hover:bg-[#e8694a] disabled:hover:bg-[#FF7A59] transition-all active:scale-[0.98]"
+                  className={`${btn.coral} disabled:opacity-50 disabled:pointer-events-none`}
                 >
                   {saveLoading ? <Loader2 className="animate-spin" size={22} /> : 'Start Learning →'}
                 </button>
