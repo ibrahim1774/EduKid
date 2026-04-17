@@ -369,10 +369,10 @@ export const OnboardingFlowView: React.FC = () => {
                 />
                 <div className="text-center space-y-1">
                   <h2 className="text-xl font-extrabold text-[#1A1F3A] tracking-tight leading-tight">
-                    Every child in your family — covered.
+                    The practice that fits — no prep, no planning, no stress.
                   </h2>
                   <p className="text-slate-500 text-sm leading-relaxed">
-                    Different ages, different grades, different needs. One account handles all of it — no juggling, no guesswork.
+                    You shouldn't have to spend evenings hunting for the right material. EduKid does the work so you can focus on being present.
                   </p>
                 </div>
                 <div className="w-full space-y-2">
@@ -493,10 +493,10 @@ export const OnboardingFlowView: React.FC = () => {
                     <BookOpen size={22} />
                   </div>
                   <h2 className="text-xl font-extrabold text-[#1A1F3A] mb-1 tracking-tight">
-                    Last step — let's meet your child.
+                    One last thing — tell us about your child.
                   </h2>
                   <p className="text-slate-500 text-sm">
-                    Tell us a little about them and we'll build their first worksheet right away.
+                    We'll use this to build a worksheet that fits them perfectly, starting today.
                   </p>
                 </div>
 
