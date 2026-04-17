@@ -326,24 +326,24 @@ export const OnboardingFlowView: React.FC = () => {
             </div>
           )}
 
-          {/* ══ SLIDE 4 — 5,000+ Worksheets ══════════════════════════════ */}
+          {/* ══ SLIDE 4 — Daily Custom Worksheets ══════════════════════════════ */}
           {slide === 4 && (
             <div className="h-screen bg-white flex flex-col items-center justify-between pt-10 pb-8 px-5">
               <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full max-w-sm">
                 <img
                   src="/assets/images/dashboard-full.png"
-                  alt="Worksheet library"
+                  alt="Daily custom worksheets"
                   className="w-full max-h-44 object-contain rounded-2xl shadow-lg shadow-indigo-50 border border-slate-100"
                 />
                 <div className="text-center space-y-1">
-                  <h2 className="text-xl font-extrabold text-[#1A1F3A]">A full worksheet library included.</h2>
-                  <p className="text-slate-500 text-sm">Everything your child needs, in one place.</p>
+                  <h2 className="text-xl font-extrabold text-[#1A1F3A]">Daily custom worksheets generated for your child.</h2>
+                  <p className="text-slate-500 text-sm">Fresh practice every day, tailored to their exact needs.</p>
                 </div>
                 <div className="w-full space-y-2">
                   {[
-                    'Printable PDFs — no prep needed',
+                    'Generated daily for your child\'s grade & focus areas',
                     'Covers Math, Reading, Writing, Science & History',
-                    'Organized by grade and topic',
+                    'Printable PDFs — no prep needed',
                   ].map((label) => (
                     <div key={label} className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
                       <Check size={15} className="text-emerald-500 flex-shrink-0" strokeWidth={3} />
