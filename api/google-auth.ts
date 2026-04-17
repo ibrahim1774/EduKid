@@ -58,9 +58,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId = newUser.user.id;
     }
 
-    // Create a session directly — no magic link email sent to the user
-    const { data: sessionData, error: sessionError } = await supabase.auth.admin.createSession({
-      user_id: userId,
+    // Generate a magic link token server-side (does NOT send email to user)
+    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+    });
+
+    if (linkError || !linkData?.properties?.hashed_token) {
+      return res.status(500).json({ error: linkError?.message || 'Failed to generate auth link' });
+    }
+
+    // Verify the token server-side to get a session (no browser redirect needed)
+    const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({
+      token_hash: linkData.properties.hashed_token,
+      type: 'magiclink',
     });
 
     if (sessionError || !sessionData.session) {
