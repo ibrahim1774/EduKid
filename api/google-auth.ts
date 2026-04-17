@@ -79,6 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
       },
       body: JSON.stringify({
+        email,
         token: linkData.properties.hashed_token,
         type: 'magiclink',
         redirect_to: '',
