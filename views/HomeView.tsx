@@ -84,10 +84,10 @@ export const HomeView: React.FC = () => {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#6C63FF]/10 text-[#6C63FF] font-bold text-xs mb-4 uppercase tracking-widest">
               <span>LEARN FROM TODAY</span>
             </div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-[1.2] mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] via-[#9333EA] to-[#DB2777]">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-[1.2] mb-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] via-[#9333EA] to-[#DB2777]">
               Give Your K-5 Child Personalized Daily Learning Practice To Help Sharpen Their Skills
             </h1>
-            <p className="text-base md:text-lg text-slate-500 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
+            <p className="text-base md:text-lg text-slate-500 mb-3 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
               Daily worksheets in various subjects — tailored to their exact grade level. Print, practice, & help your child succeed
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -106,15 +106,11 @@ export const HomeView: React.FC = () => {
               <div className="flex items-center gap-2">👪 Parent Approved</div>
               <div className="flex items-center gap-2">⭐ 4.9/5 Rating</div>
             </div>
-            <div className="mt-5 bg-[#FFF8E7] border border-amber-200 rounded-2xl px-5 py-4 flex flex-col items-center gap-3 text-center">
-              <div className="flex items-center gap-1.5 bg-[#FFD97D] rounded-lg px-3 py-1.5 shrink-0">
-                <FileText size={13} className="text-amber-900" />
-                <span className="text-amber-900 font-black text-xs uppercase tracking-wider">🎁 Free Gift Included on Plan</span>
+            <div className="mt-5 bg-[#F0F4FF] border border-indigo-100 rounded-2xl px-5 py-4 flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#6C63FF]/10 rounded-xl flex items-center justify-center shrink-0">
+                <Sparkles size={18} className="text-[#6C63FF]" />
               </div>
-              <div className="flex items-center gap-2 justify-center">
-                <span className="text-slate-600 font-medium text-sm">5,000+ printable worksheets — sent to your email on signup.</span>
-                <Mail size={15} className="text-amber-500 shrink-0" />
-              </div>
+              <span className="text-slate-600 font-medium text-sm">Daily custom worksheets generated for your child's exact grade level and needs — fresh every day.</span>
             </div>
           </motion.div>
 
@@ -327,24 +323,15 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 5,000+ Worksheets Mid-Page Callout */}
+      {/* Daily Custom Worksheets Callout */}
       <section className="bg-[#1A1F3A] py-14 px-6">
         <div className="max-w-3xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 bg-[#FFD97D] rounded-full px-4 py-1.5">
-            <FileText size={13} className="text-amber-900" />
-            <span className="text-amber-900 font-black text-xs uppercase tracking-widest">🎁 Free Gift Included on Plan</span>
+          <div className="inline-flex items-center gap-2 bg-[#6C63FF]/20 rounded-full px-4 py-1.5">
+            <Sparkles size={13} className="text-indigo-300" />
+            <span className="text-indigo-300 font-black text-xs uppercase tracking-widest">Personalized for Your Child</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white">5,000+ Digital Worksheets</h2>
-          <p className="text-slate-300 font-medium text-lg max-w-xl mx-auto">Every plan includes instant access to a massive library of grade-appropriate, printable worksheets — delivered straight to your inbox when you sign up.</p>
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-              <FileText size={20} className="text-[#FFD97D]" />
-            </div>
-            <ArrowRight size={18} className="text-slate-400" />
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-              <Mail size={20} className="text-emerald-400" />
-            </div>
-          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white">Daily Custom Worksheets</h2>
+          <p className="text-slate-300 font-medium text-lg max-w-xl mx-auto">Every day, fresh worksheets are generated specifically for your child's grade level, subjects, and focus areas — so practice is always relevant and effective.</p>
           <p className="text-slate-400 text-sm">Math, Reading, Writing & Science — all subjects, all grades.</p>
         </div>
       </section>
