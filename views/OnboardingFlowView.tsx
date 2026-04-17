@@ -215,8 +215,8 @@ export const OnboardingFlowView: React.FC = () => {
 
           {/* ══ SLIDE 1 — Emotional Hook ═══════════════════════════════════ */}
           {slide === 1 && (
-            <div className="h-screen bg-gradient-to-br from-[#4F46E5] via-[#6C63FF] to-[#8B5CF6] flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              <div className="flex-1 flex flex-col items-center justify-center gap-5 w-full max-w-sm">
+            <div className="h-screen bg-gradient-to-br from-[#4F46E5] via-[#6C63FF] to-[#8B5CF6] flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+              <div className="flex flex-col items-center gap-5 w-full max-w-sm">
                 {/* Hero image with glow */}
                 <div className="relative w-full">
                   <div className="absolute inset-0 bg-white/20 rounded-2xl blur-xl scale-90 translate-y-3" />
@@ -246,8 +246,8 @@ export const OnboardingFlowView: React.FC = () => {
 
           {/* ══ SLIDE 2 — Daily Practice Video ════════════════════════════ */}
           {slide === 2 && (
-            <div className="h-screen bg-white flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full max-w-sm">
+            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+              <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 {/* Video */}
                 <div
                   className="w-full rounded-2xl overflow-hidden shadow-xl shadow-indigo-100 border border-slate-100 bg-slate-50"
@@ -285,8 +285,8 @@ export const OnboardingFlowView: React.FC = () => {
 
           {/* ══ SLIDE 3 — How It Works ════════════════════════════════════ */}
           {slide === 3 && (
-            <div className="h-screen bg-indigo-50 flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full max-w-sm">
+            <div className="h-screen bg-indigo-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+              <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <div className="text-center space-y-1">
                   <div className="inline-flex items-center gap-1.5 bg-white text-[#6366F1] border border-indigo-100 rounded-full px-3 py-1 text-xs font-bold shadow-sm">
                     How It Works
@@ -328,8 +328,8 @@ export const OnboardingFlowView: React.FC = () => {
 
           {/* ══ SLIDE 4 — Daily Custom Worksheets ══════════════════════════════ */}
           {slide === 4 && (
-            <div className="h-screen bg-white flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full max-w-sm">
+            <div className="h-screen bg-white flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+              <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <img
                   src="/assets/images/dashboard-full.png"
                   alt="Daily custom worksheets"
@@ -363,12 +363,12 @@ export const OnboardingFlowView: React.FC = () => {
 
           {/* ══ SLIDE 5 — Built for Families ══════════════════════════════ */}
           {slide === 5 && (
-            <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-between pt-10 pb-8 px-5">
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 w-full max-w-sm">
+            <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center pt-12 pb-6 px-5 gap-6">
+              <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <img
-                  src="/assets/images/family.png"
+                  src="/assets/images/dashboard-lesson.png"
                   alt="Built for families"
-                  className="w-full max-h-44 object-contain rounded-2xl shadow-lg shadow-orange-100"
+                  className="w-full max-h-44 object-contain rounded-2xl shadow-lg shadow-orange-100 border border-slate-100"
                 />
                 <div className="text-center space-y-1">
                   <h2 className="text-xl font-extrabold text-[#1A1F3A]">Built for the whole family.</h2>
