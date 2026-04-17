@@ -58,35 +58,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId = newUser.user.id;
     }
 
-    // Generate a magic link to create a session
-    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
+    // Create a session directly — no magic link email sent to the user
+    const { data: sessionData, error: sessionError } = await supabase.auth.admin.createSession({
+      user_id: userId,
     });
 
-    if (linkError || !linkData) {
-      return res.status(500).json({ error: linkError?.message || 'Failed to generate link' });
-    }
-
-    // Use the hashed_token from the response directly
-    const token_hash = linkData.properties?.hashed_token;
-    if (!token_hash) {
-      return res.status(500).json({ error: 'No hashed_token in response' });
-    }
-
-    // Verify the OTP to get a real session
-    const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash,
-      type: 'magiclink',
-    });
-
-    if (verifyError || !verifyData.session) {
-      return res.status(500).json({ error: verifyError?.message || 'Failed to create session' });
+    if (sessionError || !sessionData.session) {
+      return res.status(500).json({ error: sessionError?.message || 'Failed to create session' });
     }
 
     return res.status(200).json({
-      access_token: verifyData.session.access_token,
-      refresh_token: verifyData.session.refresh_token,
+      access_token: sessionData.session.access_token,
+      refresh_token: sessionData.session.refresh_token,
     });
   } catch (error: any) {
     console.error('Google auth error:', error);
