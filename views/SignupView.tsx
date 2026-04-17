@@ -25,7 +25,7 @@ export const SignupView: React.FC = () => {
             access_token: data.access_token,
             refresh_token: data.refresh_token,
           });
-          navigate('/onboarding');
+          navigate('/setup');
         } else {
           setError(data.error || 'Google sign-in failed');
         }
@@ -56,7 +56,7 @@ export const SignupView: React.FC = () => {
 
       if (data.session) {
         console.log('SignupView: Session created immediately');
-        navigate('/onboarding');
+        navigate('/setup');
       } else if (data.user) {
         console.log('SignupView: User created but no session. Email confirmation likely required');
         setError('Account created! Please check your email to confirm your account before logging in.');

@@ -9,6 +9,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Grade, Subject } from '../types';
+import { COMMON_TOPICS } from '../lib/topics';
 
 const TOTAL_SLIDES = 7;
 
@@ -58,6 +59,9 @@ export const OnboardingFlowView: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError,   setAuthError]   = useState<string | null>(null);
 
+  // Preferred topics (slide 7)
+  const [preferredTopics, setPreferredTopics] = useState<Record<string, string[]>>({});
+
   // Save (slide 7)
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError,   setSaveError]   = useState<string | null>(null);
@@ -91,6 +95,14 @@ export const OnboardingFlowView: React.FC = () => {
   const back    = () => { setDir(-1); setSlide(s => Math.max(s - 1, 1)); };
   const toggle  = (sub: Subject) =>
     setChildSubjects(prev => prev.includes(sub) ? prev.filter(s => s !== sub) : [...prev, sub]);
+
+  const toggleTopic = (sub: Subject, topic: string) => {
+    const current = preferredTopics[sub] || [];
+    setPreferredTopics(prev => ({
+      ...prev,
+      [sub]: current.includes(topic) ? current.filter(t => t !== topic) : [...current, topic],
+    }));
+  };
 
   const onAuthSuccess = (id: string, email: string) => {
     setAuthed({ id, email });
@@ -163,7 +175,7 @@ export const OnboardingFlowView: React.FC = () => {
         grade:            childGrade,
         interests:        [],
         struggles:        [],
-        preferred_topics: {},
+        preferred_topics: preferredTopics,
       }]);
       if (error) throw error;
       try {
@@ -584,6 +596,38 @@ export const OnboardingFlowView: React.FC = () => {
                       })}
                     </div>
                   </div>
+
+                  {childSubjects.length > 0 && (
+                    <div>
+                      <label className="text-xs font-bold text-slate-600 block mb-2">Pick Topics to Focus On</label>
+                      <div className="space-y-3">
+                        {childSubjects.map(sub => (
+                          <div key={sub}>
+                            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">{sub}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {(COMMON_TOPICS[sub] || []).map(topic => {
+                                const picked = (preferredTopics[sub] || []).includes(topic);
+                                return (
+                                  <button
+                                    key={topic}
+                                    type="button"
+                                    onClick={() => toggleTopic(sub, topic)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all active:scale-95 ${
+                                      picked
+                                        ? 'bg-[#6366F1] text-white border-[#6366F1]'
+                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                    }`}
+                                  >
+                                    {topic}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
