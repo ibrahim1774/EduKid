@@ -3,7 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -68,19 +69,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: linkError?.message || 'Failed to generate auth link' });
     }
 
-    // Verify the token server-side to get a session (no browser redirect needed)
-    const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({
-      token_hash: linkData.properties.hashed_token,
-      type: 'magiclink',
+    // Verify the token via raw GoTrue HTTP POST (returns JSON, no redirect)
+    // Using raw fetch avoids the admin client's service-role Authorization header
+    // which causes GoTrue to reject user OTP verification.
+    const verifyRes = await fetch(`${process.env.SUPABASE_URL}/auth/v1/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      },
+      body: JSON.stringify({
+        token: linkData.properties.hashed_token,
+        type: 'magiclink',
+        redirect_to: '',
+      }),
     });
 
-    if (sessionError || !sessionData.session) {
-      return res.status(500).json({ error: sessionError?.message || 'Failed to create session' });
+    const sessionData = await verifyRes.json();
+
+    if (!verifyRes.ok || !sessionData.access_token) {
+      console.error('GoTrue verify error:', sessionData);
+      return res.status(500).json({ error: sessionData.error_description || sessionData.msg || 'Failed to create session' });
     }
 
     return res.status(200).json({
-      access_token: sessionData.session.access_token,
-      refresh_token: sessionData.session.refresh_token,
+      access_token: sessionData.access_token,
+      refresh_token: sessionData.refresh_token,
     });
   } catch (error: any) {
     console.error('Google auth error:', error);
