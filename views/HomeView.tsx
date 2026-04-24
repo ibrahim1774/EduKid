@@ -95,7 +95,7 @@ export const HomeView: React.FC = () => {
                 onClick={() => navigate('/get-started')}
                 className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
               >
-                Start a Free Trial <ArrowRight size={20} />
+                Get Started for Free <ArrowRight size={20} />
               </button>
               <button className="bg-white hover:bg-slate-50 text-[#1A1F3A] border border-slate-200 px-6 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-1 active:scale-95 shadow-sm">
                 <Play size={20} fill="currentColor" /> See How It Works
@@ -165,7 +165,7 @@ export const HomeView: React.FC = () => {
               onClick={() => navigate('/get-started')}
               className="bg-[#1A1F3A] hover:bg-black text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center gap-3"
             >
-              Start a Free Trial <ArrowRight size={22} />
+              Get Started for Free <ArrowRight size={22} />
             </button>
           </motion.div>
 
@@ -219,7 +219,7 @@ export const HomeView: React.FC = () => {
               onClick={() => navigate('/get-started')}
               className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center gap-3 mx-auto"
             >
-              Start a Free Trial <ArrowRight size={22} />
+              Get Started for Free <ArrowRight size={22} />
             </button>
           </motion.div>
         </div>
@@ -295,7 +295,7 @@ export const HomeView: React.FC = () => {
                 <div className="text-white">
                   <h3 className="text-2xl md:text-3xl font-extrabold mb-4">Complete Flexibility</h3>
                   <p className="text-indigo-100 text-lg mb-6 font-medium">Each subject can have its own daily worksheet, and parents can update subjects or focus areas at any time as the child progresses.</p>
-                  <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Start a Free Trial <ArrowRight size={20} /></button>
+                  <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] hover:bg-[#5A52E0] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all">Get Started for Free <ArrowRight size={20} /></button>
                 </div>
                 <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#1d2342]">
                   <WistiaEmbed mediaId="aepfpq0du0" />
@@ -384,7 +384,7 @@ export const HomeView: React.FC = () => {
               </div>
 
               <button onClick={() => navigate('/get-started')} className="bg-[#6C63FF] text-white px-10 py-5 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-indigo-100 transition-all mt-4 w-full md:w-auto">
-                Start a Free Trial
+                Get Started for Free
               </button>
             </div>
           </motion.div>
