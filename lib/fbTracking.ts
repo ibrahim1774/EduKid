@@ -65,6 +65,23 @@ export function trackInitiateCheckout(value?: number, currency?: string): void {
   sendServerEvent('InitiateCheckout', eventId, customData);
 }
 
+export function trackStartTrial(predictedLtv?: number, currency: string = 'USD'): void {
+  const eventId = generateEventId();
+  const customData = {
+    value: 0,
+    currency,
+    predicted_ltv: predictedLtv ?? 10.0,
+    content_name: 'Base Plan - 3 Day Free Trial',
+    content_category: 'subscription',
+  };
+
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'StartTrial', customData, { eventID: eventId });
+  }
+
+  sendServerEvent('StartTrial', eventId, customData);
+}
+
 export function trackPurchase(value: number, currency: string, transactionId?: string): void {
   const eventId = generateEventId();
   const customData = {

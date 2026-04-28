@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { trackPurchase } from '../lib/fbTracking';
+import { trackStartTrial } from '../lib/fbTracking';
 import { LearningCalendar } from '../components/LearningCalendar';
 import { isSameDay, format, startOfToday } from 'date-fns';
 import { COMMON_TOPICS } from '../lib/topics';
@@ -33,10 +33,10 @@ export const DashboardView: React.FC<DashboardProps> = ({ onViewWorksheet, onAdd
   const [fullLessonWs, setFullLessonWs] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<keyof StructuredLesson>('overview');
 
-  // Track purchase after Stripe redirect
+  // Track trial start after Stripe checkout (no charge yet — Purchase fires server-side via webhook on first real payment)
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
-      trackPurchase(10.0, 'USD');
+      trackStartTrial(10.0, 'USD');
       window.history.replaceState({}, '', '/dashboard');
     }
   }, []);
